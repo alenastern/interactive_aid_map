@@ -16,8 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function myVis(data) {
 
     const [ghanaShapes, ghanaWB] = data;
-    const width = 800
-    const height = 900
+    const width = 800;
+    const height = 900;
+    const notesHeight = 100;  
     const margin = {
         top: 10,
         left: 10,
@@ -49,6 +50,12 @@ function myVis(data) {
 
     const svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
+
+    const notes = d3.select('.notes')
+          .append('svg')
+          .attr('width', width)
+          .attr('height', notesHeight);
+
       
     // const svg =  d3.select('.first')
     //     .append('svg')
@@ -161,42 +168,40 @@ function myVis(data) {
         .style("top", topLeft[1] + "px");
     
     g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
-
-
-		function update() {
-        currentZoom = map.getZoom();
-        circles.attr("transform", 
-        function(d) { 
-          return "translate("+ 
-            map.latLngToLayerPoint(d.LatLng).x +","+ 
-            map.latLngToLayerPoint(d.LatLng).y +")";
-        })
-        
-        svg.attr("width", bottomRight[0] - topLeft[0])
-          .attr("height", bottomRight[1] - topLeft[1])
-          .style("left", topLeft[0] + "px")
-          .style("top", topLeft[1] + "px");
-      
-        g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
-    }
     
     map.on("viewreset", update);
 		  update();
   
     function projectPoint(x, y) {
 			var point = map.latLngToLayerPoint(new L.LatLng(y, x));
-			this.stream.point(point.x, point.y);
-		}
-		
+      this.stream.point(point.x, point.y);
+    }
 
-        g.append("text")             
-        .attr("transform",
-        "translate(" + (width/2 + margin.left) + " ," + 
-                       (height + margin.top + margin.bottom - 20) + ")")
-            .style("text-anchor", "left")
-            .text("Source: Project Performance Database (Honig 2018)")
-            .style("font-family", '"Lucida Console", monospace')
-            .style("font-size", "10px");
+    function update() {
+      currentZoom = map.getZoom();
+      circles.attr("transform", 
+      function(d) { 
+        return "translate("+ 
+          map.latLngToLayerPoint(d.LatLng).x +","+ 
+          map.latLngToLayerPoint(d.LatLng).y +")";
+      })
+      
+      svg.attr("width", bottomRight[0] - topLeft[0])
+        .attr("height", bottomRight[1] - topLeft[1])
+        .style("left", topLeft[0] + "px")
+        .style("top", topLeft[1] + "px");
+    
+      g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+  }
+
+    notes.append("text")             
+      .attr("transform",
+      "translate(" + (width/2 + margin.left) + " ," + 
+                      (notesHeight + margin.top - 50) + ")")
+          .style("text-anchor", "left")
+          .text("Source: Project Performance Database (Honig 2018)")
+          .style("font-family", '"Lucida Console", monospace')
+          .style("font-size", "10px");
 
       
       
