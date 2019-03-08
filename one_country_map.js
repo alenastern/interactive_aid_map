@@ -25,13 +25,8 @@ function myVis(data) {
         right: 10,
         bottom: 10
     };
-
     
-    // ghanaWB.forEach(function(d) {
-		// 	d.LatLng = new L.LatLng(d.latitude,
-		// 							d.longitude)
-    // });
-    
+    // add leaflet LatLng feature and define variables for project data
     ghanaWB.features.forEach(function(d) {
       d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
       d.funding = d.properties.total_commitments
@@ -46,36 +41,18 @@ function myVis(data) {
      
      console.log(ghanaWB)
 
-    //  var projection = d3.geoEquirectangular()
-    //      .center([0, 7.0])
-    //      .rotate([1.2, 0])
-    //      .scale(6000)
-    //      .translate([width/2,height/2]);
-
-        
-    // var path = d3.geoPath()
-    //     .projection(projection);
     
-
+    //create leaflet map
     var map = L.map('map', { center: [7.5, -1.2], zoom:7}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes).addTo(map); 
         //L.geoJSON(ghanaWB).addTo(map);
-
+    
+    // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-    var notes = d3.select('.notes')
-          .append('svg')
-          .attr('width', width)
-          .attr('height', notesHeight);
-
-      
-    // var svg =  d3.select('.first')
-    //     .append('svg')
-    //     .attr('width', width + margin.left + margin.right)
-    //     .attr('height', height + margin.top + margin.bottom)
-
+    // define color scale for project performance
     var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
     var color = d3.scaleOrdinal()
       .domain([6, 5, 4, 3, 2, 1])
@@ -83,7 +60,6 @@ function myVis(data) {
 
     //tooltip + mouseover
 
-    // change select to ".first"
     var tooltip = d3.select(map.getContainer()).append("div")
                   .attr("class", "tooltip")
                   .style("opacity", 0);
@@ -106,6 +82,14 @@ function myVis(data) {
             .style("opacity", .9) 
     };
 
+    // tooltip mouseout event handler
+    var tipMouseout = function(d) {
+      tooltip.transition()
+          .duration(300) 
+          .style("opacity", 0);
+    };
+
+    // function to change color of project locations on hover
     var onColor = function(d) {
       svg.selectAll("." + this.getAttribute('class'))
       .style("fill", "#E31480")
@@ -119,41 +103,21 @@ function myVis(data) {
       .style("opacity", .6);
 
     }
-  // tooltip mouseout event handler
-    var tipMouseout = function(d) {
-      tooltip.transition()
-          .duration(300) 
-          .style("opacity", 0);
-    };
 
-  //change back to svg
-    // g.selectAll('path')
-    //   .data(ghanaShapes.features)
-    //   .enter()
-    //   .append('path')
-    //   .attr('d', path)
-    //   .attr('fill', '#e9e9e9') 
-    //   .attr('stroke', 'black');
-
-    //change to svg
-
+    // create circles
     var circles=  g.selectAll('circle')
       .data(ghanaWB.features)
       .enter()
       .append('circle')
       .attr("class", function(d) { return d.id; })
-      //.attr("cx", function(d) {
-      //    return projection([d.longitude, d.latitude])[0];
-      //})
-      //.attr("cy", function(d) {
-      //    return projection([d.longitude, d.latitude])[1];
-      // })
+
       .attr('fill', d => color(d.performance))
       .attr('stroke-width', 0.25)
       .attr('opacity', 0.60);
 
       console.log('hi!')
 
+      // circles mouseover + transition
       circles.transition()
         .duration(3000)
         .attr("r", function(d) {
@@ -173,28 +137,18 @@ function myVis(data) {
 
     var path = d3.geoPath().projection(transform);
 
-    // var bounds = path.bounds(ghanaWB),
-    //   topLeft = bounds[0],
-    //   bottomRight = bounds[1];
-
-    // svg.attr("width", bottomRight[0] - topLeft[0])
-    //     .attr("height", bottomRight[1] - topLeft[1])
-    //     .style("left", topLeft[0] + "px")
-    //     .style("top", topLeft[1] + "px");
     
-    // g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
     
-    map.on("viewreset", update);
-		update();
+    //map.on("viewreset", update);
+		//update();
   
     function projectPoint(x, y) {
 			var point = map.latLngToLayerPoint(new L.LatLng(y, x));
       this.stream.point(point.x, point.y);
     }
 
+    // adjust points on zoom
     map.on("moveend", update);
-    //map.on('zoomstart', function(d) {
-    //  d3.select("#map").selectAll("circle").remove();})
     update();
     
     function update() {
@@ -218,15 +172,6 @@ function myVis(data) {
           map.latLngToLayerPoint(d.LatLng).y +")";
       });
     }
-
-    // notes.append("text")             
-    //   .attr("transform",
-    //   "translate(" + (width/2 + margin.left) + " ," + 
-    //                   (notesHeight + margin.top - 50) + ")")
-    //       .style("text-anchor", "left")
-    //       .text("Source: Project Performance Database (Honig 2018)")
-    //       .style("font-family", '"Lucida Console", monospace')
-    //       .style("font-size", "10px");
 
       
       
