@@ -2,6 +2,17 @@
 //import {geoPath, geoAlbersUsa} from 'd3-geo';
 //import {select} from 'd3-selection';
 
+// best way to load different data sets for side plots
+
+// ideas for overlapping circles
+// https://stackoverflow.com/questions/28647623/collision-overlap-detection-of-circles-in-a-d3-transition
+// https://bl.ocks.org/mbostock/1093130
+
+// preturbation on points, put on wheel - which is biggest, set radius to be double largest, divide up wedge space based on 
+// number, they'll all fit (similar to b)
+
+// one function called from promise chain
+// main function call scatter and bar in own function 
 
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all(['./ghana_2.geojson',
@@ -41,11 +52,16 @@ function myVis(data) {
      
      console.log(ghanaWB)
 
-    
+    var shapeStyle = {
+      "color": "#6A6A6A",
+      "weight": 3,
+      "opacity": 0.5
+  };
+
     //create leaflet map
     var map = L.map('map', { center: [7.5, -1.2], zoom:7}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
-        L.geoJSON(ghanaShapes).addTo(map); 
+        L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
         //L.geoJSON(ghanaWB).addTo(map);
     
     // append svg to map, g to svg
@@ -61,19 +77,22 @@ function myVis(data) {
     //tooltip + mouseover
 
     var tooltip = d3.select(map.getContainer()).append("div")
+                  .attr("padding", 10 + "px")
                   .attr("class", "tooltip")
                   .style("opacity", 0);
 
     var tipMouseover = function(d) {
 
+      var funding = d3.format("($,.2f")(d.funding)
       var cl = color(d.six_overall_rating);
       var html  = "<b>Title:</b> " + d.title + "<br/>" +
                     "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
-                  "<b>Funding:</b> " +  d.funding + "<br/>" +
+                  "<b>Funding:</b> " + funding + "<br/>" +
                   "<b>Performance:<span style='color:" + cl + ";'> " +  d.perf_cat + "</span></b><br/>" +
                   "<b>Goal:</b> " + d.sdg;
 
       tooltip.html(html)
+          .attr("padding", 3 + "px")
           .style("left", (d3.event.pageX + 15) + "px")
           .style("top", (d3.event.pageY - 28) + "px")
           .style("z-index", "999")
@@ -159,9 +178,7 @@ function myVis(data) {
          topLeft = bounds[0],
          bottomRight = bounds[1];
 
-      var padding = 25;  // In pixels, choose large enough to prevent edge clipping
-         // of your largest element
-
+      var padding = 25;  
         topLeft = [topLeft[0]-padding, topLeft[1] - padding]
         bottomRight = [bottomRight[0]+padding, bottomRight[1]+ padding] 
   
@@ -178,10 +195,63 @@ function myVis(data) {
           map.latLngToLayerPoint(d.LatLng).x +","+ 
           map.latLngToLayerPoint(d.LatLng).y +")";
       });
-    }
 
-      
+      var scatterWidth = 430;
+  var scatterHeight= 360;
+  var scatterMargin = {
+    top: 10,
+    left: 10,
+    right: 10,
+    bottom: 10
+};
+
+    }
       
 }  
 
 
+
+
+
+var scatterWidth = 430;
+var scatterHeight= 360;
+var scatterMargin = {
+    top: 10,
+    left: 10,
+    right: 10,
+    bottom: 10};
+
+var svg1 = d3.select('#proj_highlight')
+    .append('svg')
+    .attr('width', scatterWidth)
+    .attr('height', scatterHeight);
+
+var g1= svg1.append("g")
+    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
+    
+var note  = g1.append("text")             
+       .attr("transform",
+       "translate(" + (scatterMargin.left) + " ," + 
+                       (scatterHeight/2 + scatterMargin.top ) + ")")
+           .style("text-anchor", "left")
+           .text("A scatter plot will live here")
+           .style("font-family", '"Lucida Console", monospace')
+           .style("font-size", "14px");
+
+var svg2 = d3.select('#proj_highlight')
+    .append('svg')
+    .attr('width', scatterWidth)
+    .attr('height', scatterHeight)
+    .attr('top', scatterHeight + 5);
+
+var g2= svg2.append("g")
+    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
+    
+var note2  = g2.append("text")             
+      .attr("transform",
+      "translate(" + (scatterMargin.left) + " ," + 
+                      (scatterHeight/2 + scatterMargin.top ) + ")")
+          .style("text-anchor", "left")
+          .text("A bar plot will live here")
+          .style("font-family", '"Lucida Console", monospace')
+          .style("font-size", "14px");
