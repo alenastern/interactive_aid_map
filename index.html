@@ -9,13 +9,35 @@
    crossorigin=""/>
 </head>
 <body>
+    
   <h1>World Bank Projects in Ghana</h1>
-    <div class="first" id ="map"></div>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="one_country_map.1.js"></script>
+    <div class="first"></div>
+    <div id = 'main'>
+      <div class = "container">
+        <div class = "row">
+          <div id = 'map'></div>
+          <div id = "proj_highlight">
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
     integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
     crossorigin=""></script>
-    <div class="notes"></div>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="one_country_map.js"></script>
+    <header class="header clearfix">
+        <nav class="navbar fixed-bottom navbar-expand navbar-light" style="background-color: #125169;">
+            <a class="navbar-brand" href="https://www.github.com/alenastern" style="color:#FFFFFF;">&copy; Alena Stern</a>
+            <div class = 'sources'>
+              <p style="color:#FFFFFF;"> Data Sources:&nbsp
+              <a href="https://danhonig.info/" style="color:#FFFFFF;">Project Performance Database</a>
+              &nbsp
+              <a href = "https://www.aiddata.org/data/world-bank-geocoded-research-release-level-1-v1-4-2" style="color:#FFFFFF;"> World Bank Projects</a> 
+              &nbsp
+              <a href = "https://www.aiddata.org/methods/sdg-coding" style="color:#FFFFFF;"> SDG Coding</a>
+              </p>
+            </dv>
+    </header>
 </body>
 </html>

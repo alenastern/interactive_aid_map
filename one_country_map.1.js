@@ -26,12 +26,17 @@ function myVis(data) {
         bottom: 10
     };
 
-    
+  const colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
+  const color = d3.scaleOrdinal()
+    .domain([6, 5, 4, 3, 2, 1])
+    .range(colorRange);
    
 
-  const map = L.map('map', { center: [7.0, -1.2], zoom:6}); 
+  var map = L.map('map', { center: [7.0, -1.2], zoom:7, renderer: L.svg()}); 
     L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
-    L.geoJSON(ghanaShapes).addTo(map); 
+    
+    
+  var admin =  L.geoJSON(ghanaShapes).addTo(map); 
     //L.geoJSON(ghanaWB).addTo(map);
 
 
@@ -40,18 +45,20 @@ function myVis(data) {
 		// 							d.longitude)
     // });
     
-  var geojsonMarkerOptions = {
-      radius: 8,
-      fillColor: "#ff7800",
-      color: "#000",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-  };
+  //var geojsonMarkerOptions = ;
   
 L.geoJSON(ghanaWB, {
     pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, geojsonMarkerOptions);
+        return L.circleMarker(latlng, {
+          stroke: true,
+          radius: Math.sqrt(parseInt(feature.properties.total_commitments) * 0.000002),
+          fillColor: color(feature.properties.six_overall_rating),
+          color: 'black',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.6,
+          className: feature.properties.project_id
+      });
     }
   }).addTo(map);
 }

@@ -56,3 +56,47 @@ li {
 .circle.active {
     fill: yellow;
   }
+
+#map {
+    display: flex;
+    flex: 1;
+    /*height: 100vh - 100px;
+    width: 60vw;*/
+    height: 725px;
+    width: 725px;
+}
+
+#proj_highlight {
+    width: 400px;
+    height: 725px;
+    margin-left: 10px;
+}
+
+#main {
+    width: 100%;
+    height: 800px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.navbar {
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-family: "Lucida Console", monospace; 
+  }
+
+svg {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+g {
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}

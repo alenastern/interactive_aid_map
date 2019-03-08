@@ -5,7 +5,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all(['./ghana_2.geojson',
-    './d3_ghana_data.json'
+    './ghana_wb.geojson'
     ].map(url => fetch(url).then(data => data.json())))
     .then(data => myVis(data)).catch(error => {
           console.log(`The following error has occured: ${error}`)
@@ -15,11 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function myVis(data) {
 
-    const [ghanaShapes, ghanaWB] = data;
-    const width = 800;
-    const height = 900;
-    const notesHeight = 100;  
-    const margin = {
+    var [ghanaShapes, ghanaWB] = data;
+    var width = 800;
+    var height = 900;
+    var notesHeight = 100;  
+    var margin = {
         top: 10,
         left: 10,
         right: 10,
@@ -27,61 +27,75 @@ function myVis(data) {
     };
 
     
-    ghanaWB.forEach(function(d) {
-			d.LatLng = new L.LatLng(d.latitude,
-									d.longitude)
-		});
+    // ghanaWB.forEach(function(d) {
+		// 	d.LatLng = new L.LatLng(d.latitude,
+		// 							d.longitude)
+    // });
+    
+    ghanaWB.features.forEach(function(d) {
+      d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
+      d.funding = d.properties.total_commitments
+      d.id = d.properties.project_id
+      d.performance = d.properties.six_overall_rating
+      d.title = d.properties.project_title
+      d.start = d.properties.start_actual_isodate
+      d.end = d.properties.end_actual_isodate
+      d.perf_cat = d.properties.performance_cat
+      d.sdg = d.properties.goal
+     });
+     
+     console.log(ghanaWB)
 
-    //  const projection = d3.geoEquirectangular()
+    //  var projection = d3.geoEquirectangular()
     //      .center([0, 7.0])
     //      .rotate([1.2, 0])
     //      .scale(6000)
     //      .translate([width/2,height/2]);
 
         
-    // const path = d3.geoPath()
+    // var path = d3.geoPath()
     //     .projection(projection);
     
 
-    const map = L.map('map', { center: [7.0, -1.2], zoom:6}); 
+    var map = L.map('map', { center: [7.5, -1.2], zoom:7}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes).addTo(map); 
-        L.geoJSON(ghanaWB).addTo(map);
+        //L.geoJSON(ghanaWB).addTo(map);
 
-    const svg = d3.select(map.getPanes().overlayPane).append("svg"),
+    var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-    const notes = d3.select('.notes')
+    var notes = d3.select('.notes')
           .append('svg')
           .attr('width', width)
           .attr('height', notesHeight);
 
       
-    // const svg =  d3.select('.first')
+    // var svg =  d3.select('.first')
     //     .append('svg')
     //     .attr('width', width + margin.left + margin.right)
     //     .attr('height', height + margin.top + margin.bottom)
 
-    const colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
-    const color = d3.scaleOrdinal()
+    var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
+    var color = d3.scaleOrdinal()
       .domain([6, 5, 4, 3, 2, 1])
       .range(colorRange);
 
     //tooltip + mouseover
 
     // change select to ".first"
-    const tooltip = d3.select(map.getContainer()).append("div")
+    var tooltip = d3.select(map.getContainer()).append("div")
                   .attr("class", "tooltip")
                   .style("opacity", 0);
 
-    const tipMouseover = function(d) {
+    var tipMouseover = function(d) {
 
-      const cl = color(d.six_overall_rating);
-      const html  = "<b>Title:</b> " + d.project_title + "<br/>" +
-                    "<b>Start Date:</b> " + d.start_actual_isodate + " <b>End Date:</b> " + d.end_actual_isodate + "<br/>" + 
-                  "<b>Funding:</b> " +  d.total_commitments + "<br/>" +
-                  "<b>Performance:<span style='color:" + cl + ";'> " +  d.performance_cat + "</span></b><br/>" +
-                  "<b>Goal:</b> " + d.goal;
+      var cl = color(d.six_overall_rating);
+      var html  = "<b>Title:</b> " + d.title + "<br/>" +
+                    "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
+                  "<b>Funding:</b> " +  d.funding + "<br/>" +
+                  "<b>Performance:<span style='color:" + cl + ";'> " +  d.perf_cat + "</span></b><br/>" +
+                  "<b>Goal:</b> " + d.sdg;
 
       tooltip.html(html)
           .style("left", (d3.event.pageX + 15) + "px")
@@ -92,16 +106,16 @@ function myVis(data) {
             .style("opacity", .9) 
     };
 
-    const onColor = function(d) {
+    var onColor = function(d) {
       svg.selectAll("." + this.getAttribute('class'))
       .style("fill", "#E31480")
       .style("opacity", .9);
 
     }
 
-    const outColor = function(d) {
+    var outColor = function(d) {
       svg.selectAll("." + this.getAttribute('class'))
-      .style("fill",  d => color(d.six_overall_rating))
+      .style("fill",  d => color(d.performance))
       .style("opacity", .6);
 
     }
@@ -123,26 +137,27 @@ function myVis(data) {
 
     //change to svg
 
-    const circles=  g.selectAll('circle')
-      .data(ghanaWB)
+    var circles=  g.selectAll('circle')
+      .data(ghanaWB.features)
       .enter()
       .append('circle')
-      .attr("class", function(d) { return d.project_id; })
+      .attr("class", function(d) { return d.id; })
       //.attr("cx", function(d) {
       //    return projection([d.longitude, d.latitude])[0];
       //})
       //.attr("cy", function(d) {
       //    return projection([d.longitude, d.latitude])[1];
       // })
-      .attr('fill', d => color(d.six_overall_rating))
+      .attr('fill', d => color(d.performance))
       .attr('stroke-width', 0.25)
       .attr('opacity', 0.60);
-    
+
+      console.log('hi!')
 
       circles.transition()
         .duration(3000)
         .attr("r", function(d) {
-            return Math.sqrt(parseInt(d.total_commitments) * 0.000002);
+            return Math.sqrt(parseInt(d.funding) * 0.000002);
         });
       circles.on("mouseover", function(d) {
         tipMouseover(d);
@@ -153,55 +168,65 @@ function myVis(data) {
         outColor.call(this, d);
       });
 
+    //https://leafletjs.com/reference-1.4.0.html#circle  
+    var transform = d3.geoTransform({point: projectPoint});
 
-    const transform = d3.geoTransform({point: projectPoint});
+    var path = d3.geoPath().projection(transform);
 
-    const path = d3.geoPath().projection(transform);
+    // var bounds = path.bounds(ghanaWB),
+    //   topLeft = bounds[0],
+    //   bottomRight = bounds[1];
 
-    const bounds = path.bounds(ghanaShapes),
-      topLeft = bounds[0],
-      bottomRight = bounds[1];
-
-    svg.attr("width", bottomRight[0] - topLeft[0])
-        .attr("height", bottomRight[1] - topLeft[1])
-        .style("left", topLeft[0] + "px")
-        .style("top", topLeft[1] + "px");
+    // svg.attr("width", bottomRight[0] - topLeft[0])
+    //     .attr("height", bottomRight[1] - topLeft[1])
+    //     .style("left", topLeft[0] + "px")
+    //     .style("top", topLeft[1] + "px");
     
-    g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+    // g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
     
     map.on("viewreset", update);
-		  update();
+		update();
   
     function projectPoint(x, y) {
 			var point = map.latLngToLayerPoint(new L.LatLng(y, x));
       this.stream.point(point.x, point.y);
     }
 
+    map.on("moveend", update);
+    //map.on('zoomstart', function(d) {
+    //  d3.select("#map").selectAll("circle").remove();})
+    update();
+    
     function update() {
-      currentZoom = map.getZoom();
-      circles.attr("transform", 
-      function(d) { 
+      console.log('map was reset')
+
+      var bounds = path.bounds(ghanaWB),
+         topLeft = bounds[0],
+         bottomRight = bounds[1];
+  
+      svg.attr("width", bottomRight[0] - topLeft[0])
+          .attr("height", bottomRight[1] - topLeft[1])
+          .style("left", topLeft[0] + "px")
+          .style("top", topLeft[1] + "px");
+      
+      g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+  
+  
+      circles.attr("transform", function(d) { 
         return "translate("+ 
           map.latLngToLayerPoint(d.LatLng).x +","+ 
           map.latLngToLayerPoint(d.LatLng).y +")";
-      })
-      
-      svg.attr("width", bottomRight[0] - topLeft[0])
-        .attr("height", bottomRight[1] - topLeft[1])
-        .style("left", topLeft[0] + "px")
-        .style("top", topLeft[1] + "px");
-    
-      g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
-  }
+      });
+    }
 
-    notes.append("text")             
-      .attr("transform",
-      "translate(" + (width/2 + margin.left) + " ," + 
-                      (notesHeight + margin.top - 50) + ")")
-          .style("text-anchor", "left")
-          .text("Source: Project Performance Database (Honig 2018)")
-          .style("font-family", '"Lucida Console", monospace')
-          .style("font-size", "10px");
+    // notes.append("text")             
+    //   .attr("transform",
+    //   "translate(" + (width/2 + margin.left) + " ," + 
+    //                   (notesHeight + margin.top - 50) + ")")
+    //       .style("text-anchor", "left")
+    //       .text("Source: Project Performance Database (Honig 2018)")
+    //       .style("font-family", '"Lucida Console", monospace')
+    //       .style("font-size", "10px");
 
       
       
