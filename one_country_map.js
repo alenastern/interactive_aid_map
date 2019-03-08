@@ -112,6 +112,7 @@ function myVis(data) {
       .attr("class", function(d) { return d.id; })
 
       .attr('fill', d => color(d.performance))
+      .attr('stroke', 'black')
       .attr('stroke-width', 0.25)
       .attr('opacity', 0.60);
 
@@ -157,6 +158,12 @@ function myVis(data) {
       var bounds = path.bounds(ghanaWB),
          topLeft = bounds[0],
          bottomRight = bounds[1];
+
+      var padding = 25;  // In pixels, choose large enough to prevent edge clipping
+         // of your largest element
+
+        topLeft = [topLeft[0]-padding, topLeft[1] - padding]
+        bottomRight = [bottomRight[0]+padding, bottomRight[1]+ padding] 
   
       svg.attr("width", bottomRight[0] - topLeft[0])
           .attr("height", bottomRight[1] - topLeft[1])
