@@ -1,8 +1,3 @@
-// create svg and g blocks
-//import {geoPath, geoAlbersUsa} from 'd3-geo';
-//import {select} from 'd3-selection';
-
-// best way to load different data sets for side plots
 
 // ideas for overlapping circles
 // https://stackoverflow.com/questions/28647623/collision-overlap-detection-of-circles-in-a-d3-transition
@@ -13,6 +8,10 @@
 
 // one function called from promise chain
 // main function call scatter and bar in own function 
+
+// inspiration for map:
+// http://bl.ocks.org/d3noob/9267535
+// http://bl.ocks.org/bimannie/33494479e839c3fe3735eac00be69787 
 
 function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
@@ -62,11 +61,28 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
         //L.geoJSON(ghanaWB).addTo(map);
     
+
+
+
+    
+
+    //legend.addTo(map);
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-    // define color scale for project performance
+  //  // create legend
+  //  var colorLegend = d3.legend.color()
+  //       .labelFormat(d3.format(".0f"))
+  //       .scale(color)
+  //       .shapePadding(5)
+  //       .shapeWidth(50)
+  //       .shapeHeight(20)
+  //       .labelOffset(12);
+
+    // svg.append("g")
+    //     .attr("transform", `translate(500, ${plot_dims.map.height - 100})`)
+    //     .call(colorLegend);
   
 
     //tooltip + mouseover
@@ -79,7 +95,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var tipMouseover = function(d) {
 
       var funding = d3.format("($,.2f")(d.funding)
-      var cl = color(d.six_overall_rating);
+      var cl = color(d.performance);
       var html  = "<b>Title:</b> " + d.title + "<br/>" +
                     "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
                   "<b>Funding:</b> " + funding + "<br/>" +
@@ -180,11 +196,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var transform = d3.geoTransform({point: projectPoint});
 
     var path = d3.geoPath().projection(transform);
-
-    
-    
-    //map.on("viewreset", update);
-		//update();
   
     function projectPoint(x, y) {
 			var point = map.latLngToLayerPoint(new L.LatLng(y, x));
@@ -223,33 +234,3 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
 }
       
- 
-
-//
-
-// var svg2 = d3.select('#proj_highlight')
-//   .append('svg')
-//   .attr('width', scatterWidth)
-//   .attr('height', scatterHeight)
-//   .attr('top', scatterHeight + 5);
-
-// var g2= svg2.append("g")
-//   .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
-  
-// var note2  = g2.append("text")             
-//     .attr("transform",
-//     "translate(" + (scatterMargin.left) + " ," + 
-//                     (scatterHeight/2 + scatterMargin.top ) + ")")
-//         .style("text-anchor", "left")
-//         .text("A bar plot will live here")
-//         .style("font-family", '"Lucida Console", monospace')
-//         .style("font-size", "14px");
-
-
-        // var scatterWidth = 430;
-        // var scatterHeight= 360;
-        // var scatterMargin = {
-        //   top: 10,
-        //   left: 10,
-        //   right: 10,
-        //   bottom: 10
