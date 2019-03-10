@@ -14,29 +14,26 @@
 // one function called from promise chain
 // main function call scatter and bar in own function 
 
-document.addEventListener('DOMContentLoaded', () => {
-    Promise.all(['./ghana_2.geojson',
-    './ghana_wb.geojson'
-    ].map(url => fetch(url).then(data => data.json())))
-    .then(data => myVis(data)).catch(error => {
-          console.log(`The following error has occured: ${error}`)
-      })
-  });
+function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
-
-function myVis(data) {
-
-    var [ghanaShapes, ghanaWB] = data;
-    var width = 800;
-    var height = 900;
-    var notesHeight = 100;  
-    var margin = {
-        top: 10,
-        left: 10,
-        right: 10,
-        bottom: 10
-    };
+    //var [ghanaShapes, ghanaWB, ghanaPriority] = data;
     
+
+    //var active_goal = 'None';
+    //create scatter
+    //myScatter(ghanaPriority);
+
+    console.log(ghanaPriority);
+
+    var goal_dict = {};
+
+    ghanaPriority.forEach(d => goal_dict[d.goal] = d.six_overall_rating)
+
+    //var goal_dict = ghanaPriority(function(d){return {d.goal : d.six_overall_rating}; });
+
+
+    console.log(goal_dict);
+
     // add leaflet LatLng feature and define variables for project data
     ghanaWB.features.forEach(function(d) {
       d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
@@ -48,9 +45,10 @@ function myVis(data) {
       d.end = d.properties.end_actual_isodate
       d.perf_cat = d.properties.performance_cat
       d.sdg = d.properties.goal
+      d.sdg_name = d.properties.goal_name
      });
      
-     console.log(ghanaWB)
+    console.log(ghanaWB)
 
     var shapeStyle = {
       "color": "#6A6A6A",
@@ -69,10 +67,7 @@ function myVis(data) {
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
     // define color scale for project performance
-    var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
-    var color = d3.scaleOrdinal()
-      .domain([6, 5, 4, 3, 2, 1])
-      .range(colorRange);
+  
 
     //tooltip + mouseover
 
@@ -89,7 +84,7 @@ function myVis(data) {
                     "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
                   "<b>Funding:</b> " + funding + "<br/>" +
                   "<b>Performance:<span style='color:" + cl + ";'> " +  d.perf_cat + "</span></b><br/>" +
-                  "<b>Goal:</b> " + d.sdg;
+                  "<b>Goal:</b> " + d.sdg_name;
 
       tooltip.html(html)
           .attr("padding", 3 + "px")
@@ -113,16 +108,39 @@ function myVis(data) {
       svg.selectAll("." + this.getAttribute('class'))
       .style("fill", "#E31480")
       .style("opacity", .9);
+    }
 
+    var onGoal = function(d) {
+      console.log("#" + d.sdg)
+      d3.select("#" + d.sdg)
+      .style("fill", "#E31480")
+      .style("opacity", .9);
+    }
+
+    var onPerf = function(d) {
+      console.log("#cat_" + d.performance)
+      d3.select("#cat_" + d.performance)
+      .style("stroke", "#E31480")
+      .style("opacity", .9);
     }
 
     var outColor = function(d) {
       svg.selectAll("." + this.getAttribute('class'))
       .style("fill",  d => color(d.performance))
-      .style("opacity", .6);
-
+      .style("opacity", .8);
     }
 
+    var outGoal = function(d) {
+      d3.select("#" + d.sdg)
+      .style("fill", color(goal_dict[d.sdg]))
+      .style("opacity", .8);
+    }
+
+    var outPerf = function(d) {
+      d3.select("#cat_" + d.performance)
+      .style("stroke", color(d.performance))
+      .style("opacity", .7);
+    }
     // create circles
     var circles=  g.selectAll('circle')
       .data(ghanaWB.features)
@@ -133,7 +151,7 @@ function myVis(data) {
       .attr('fill', d => color(d.performance))
       .attr('stroke', 'black')
       .attr('stroke-width', 0.25)
-      .attr('opacity', 0.60);
+      .attr('opacity', 0.8);
 
       console.log('hi!')
 
@@ -146,11 +164,17 @@ function myVis(data) {
       circles.on("mouseover", function(d) {
         tipMouseover(d);
         onColor.call(this, d);
+        onGoal.call(this, d);
+        onPerf.call(this, d);
       });
       circles.on("mouseout", function(d) {
         tipMouseout(d);
         outColor.call(this, d);
+        outGoal.call(this, d);
+        outPerf.call(this, d);
       });
+    
+    
 
     //https://leafletjs.com/reference-1.4.0.html#circle  
     var transform = d3.geoTransform({point: projectPoint});
@@ -195,63 +219,37 @@ function myVis(data) {
           map.latLngToLayerPoint(d.LatLng).x +","+ 
           map.latLngToLayerPoint(d.LatLng).y +")";
       });
-
-      var scatterWidth = 430;
-  var scatterHeight= 360;
-  var scatterMargin = {
-    top: 10,
-    left: 10,
-    right: 10,
-    bottom: 10
 };
 
-    }
+}
       
-}  
+ 
+
+//
+
+// var svg2 = d3.select('#proj_highlight')
+//   .append('svg')
+//   .attr('width', scatterWidth)
+//   .attr('height', scatterHeight)
+//   .attr('top', scatterHeight + 5);
+
+// var g2= svg2.append("g")
+//   .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
+  
+// var note2  = g2.append("text")             
+//     .attr("transform",
+//     "translate(" + (scatterMargin.left) + " ," + 
+//                     (scatterHeight/2 + scatterMargin.top ) + ")")
+//         .style("text-anchor", "left")
+//         .text("A bar plot will live here")
+//         .style("font-family", '"Lucida Console", monospace')
+//         .style("font-size", "14px");
 
 
-
-
-
-var scatterWidth = 430;
-var scatterHeight= 360;
-var scatterMargin = {
-    top: 10,
-    left: 10,
-    right: 10,
-    bottom: 10};
-
-var svg1 = d3.select('#proj_highlight')
-    .append('svg')
-    .attr('width', scatterWidth)
-    .attr('height', scatterHeight);
-
-var g1= svg1.append("g")
-    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
-    
-var note  = g1.append("text")             
-       .attr("transform",
-       "translate(" + (scatterMargin.left) + " ," + 
-                       (scatterHeight/2 + scatterMargin.top ) + ")")
-           .style("text-anchor", "left")
-           .text("A scatter plot will live here")
-           .style("font-family", '"Lucida Console", monospace')
-           .style("font-size", "14px");
-
-var svg2 = d3.select('#proj_highlight')
-    .append('svg')
-    .attr('width', scatterWidth)
-    .attr('height', scatterHeight)
-    .attr('top', scatterHeight + 5);
-
-var g2= svg2.append("g")
-    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
-    
-var note2  = g2.append("text")             
-      .attr("transform",
-      "translate(" + (scatterMargin.left) + " ," + 
-                      (scatterHeight/2 + scatterMargin.top ) + ")")
-          .style("text-anchor", "left")
-          .text("A bar plot will live here")
-          .style("font-family", '"Lucida Console", monospace')
-          .style("font-size", "14px");
+        // var scatterWidth = 430;
+        // var scatterHeight= 360;
+        // var scatterMargin = {
+        //   top: 10,
+        //   left: 10,
+        //   right: 10,
+        //   bottom: 10
