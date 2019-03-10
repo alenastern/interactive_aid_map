@@ -50,7 +50,7 @@ function myScatter(ghanaPriority) {
     .style("font-family",'"Lucida Console", monospace');
 
     const chart = g1.append('g')
-    .attr('transform', `translate(30,0)`)
+    .attr('transform', `translate(${plot_dims.scatter.margin.left},0)`)
     .attr('height', plot_dims.scatter.height)
     .attr('width', plot_dims.scatter.width)
 
@@ -67,6 +67,23 @@ function myScatter(ghanaPriority) {
             circles.transition()
                     .duration(3000)
                     .attr("r", 8);
+
+    svg1.append('text')
+        .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
+        .attr('y', plot_dims.scatter.margin.left -10)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .text('Leader Priority Ranking (1 = highest)')
+        .style("font-family",'"Lucida Console", monospace')
+        .style("font-size", "12px");
+    
+    svg1.append('text')
+        .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
+        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+        .attr('text-anchor', 'middle')
+        .text('Donor Priority Ranking')
+        .style("font-family",'"Lucida Console", monospace')
+        .style("font-size", "12px");
             //circles.on("mouseover", tipMouseover);
             //circles.on("mouseout", tipMouseout);
 

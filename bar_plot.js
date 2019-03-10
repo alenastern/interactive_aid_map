@@ -16,7 +16,7 @@ function myBar(ghanaCount) {
     .append('svg')
     .attr('width', plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)
     .attr('height', plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)
-    .attr('y', 370 + "px");
+    .attr('y', 355 + "px");
 
     var g2= svg2.append("g")
     .attr("transform", `translate(20, ${plot_dims.scatter.margin.top})`);
@@ -33,7 +33,7 @@ function myBar(ghanaCount) {
     const x = d3.scaleBand()
         .domain([1, 2, 3, 4, 5, 6])
         .range([0, plot_dims.scatter.width - plot_dims.scatter.margin.left - 15])
-        .padding(0.1);
+        .padding([0.2]);
 
     const y =  d3.scaleLinear()
         .domain([0, yDomain.max])
@@ -60,30 +60,46 @@ function myBar(ghanaCount) {
         .style("font-family",'"Lucida Console", monospace');
 
     const chart = g2.append('g')
-    .attr('transform', `translate(30,0)`)
-    .attr('height', plot_dims.scatter.height)
-    .attr('width', plot_dims.scatter.width)
+        .attr('transform', `translate(${plot_dims.scatter.margin.left},0)`)
+        .attr('height', plot_dims.scatter.height)
+        .attr('width', plot_dims.scatter.width)
 
-     var barWidth = plot_dims.scatter.width / ghanaCount.length;
+     var barWidth = ((plot_dims.scatter.width - plot_dims.scatter.margin.left - 15) / ghanaCount.length) - 5;
 
-    var bar = chart.selectAll("g")
-        .data(ghanaCount)
-        .enter().append("g")
-        .attr("transform", function(d, i) { return "translate(" + i * barWidth + ",0)"; });
+    var rects = chart.selectAll("rect")
+        .data(ghanaCount);
 
-    bar.append("rect")
-        .attr("y", function(d) { return y(d.count); })
-        .attr("height", function(d) { return plot_dims.scatter.height - y(d.count); })
-        .attr("width", barWidth - 1)
+    rects.enter()
+        .append('rect')
+        .attr('class', 'rect')
+        .attr('width', x.bandwidth())
+        .attr('x', d => x(d.six_overall_rating))
+        .attr('y', plot_dims.scatter.height)
+        .attr('height', 0)
         .style("fill",  d => color(d.six_overall_rating))
         .style("stroke", d => color(d.six_overall_rating))
         .style("stroke-width", 10)
         .style("opacity", .7)
-        .attr("id", d => "cat_" + d.six_overall_rating);
+        .attr("id", d => "cat_" + d.six_overall_rating)
+        .transition()
+        .duration(3000)
+        .attr('y', d => y(d.count))
+        .attr('height', d => plot_dims.scatter.height - y(d.count));
 
-    // bar.append("text")
-    //     .attr("x", barWidth / 2)
-    //     .attr("y", function(d) { return y(d.value) + 3; })
-    //     .attr("dy", ".75em")
-    //     .text(function(d) { return d.value; });
+    svg2.append('text')
+        .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
+        .attr('y', plot_dims.scatter.margin.left -10)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .text('Count Projects')
+        .style("font-family",'"Lucida Console", monospace')
+        .style("font-size", "12px");
+    
+    svg2.append('text')
+        .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
+        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+        .attr('text-anchor', 'middle')
+        .text('Performance Rating')
+        .style("font-family",'"Lucida Console", monospace')
+        .style("font-size", "12px");
 }
