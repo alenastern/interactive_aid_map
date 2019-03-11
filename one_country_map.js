@@ -124,6 +124,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .7);
     }
 
+    var to_click = true
 
     var clicked = function (d) {
       // Zoom to selected project on the map
@@ -131,9 +132,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
       // get current geoid
       var geo_id_this = this.getAttribute('geoid');
-      console.log(geo_id_this)
+      // get current transform 
       var translate_this = this.getAttribute('transform');
-      console.log(translate_this[0])
     
 
       // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
@@ -154,13 +154,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
       //define radius of spread as 2x radius of largest circle
       var max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
+      //https://stackoverflow.com/questions/6756104/get-size-of-json-object
       var len = Object.keys(d_filter).length;
       //define angles as radians/ number of points in stack
       var theta = (2*Math.PI)/len;
      
       //if multiple projects in same location, scatter on click
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
-      if (len > 1) {
+      if (len > 1 & to_click === true) {
       d_filter.forEach(function(d, i) {
           var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
           //console.log(x_tran)
@@ -168,16 +169,26 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           //console.log(y_tran);
           var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
           //var proj_select = selection.filter("." + d.id)
-          .attr("transform", `translate(${x_tran}, ${y_tran})`);   
-          console.log(`translate(${x_tran}, ${y_tran})`)     
-        });
+          .attr("transform", `translate(${x_tran}, ${y_tran})`)
+          .transition()
+          .duration(1000);   // transition doesn't seem to be working
+          console.log(`translate(${x_tran}, ${y_tran})`)   
+          to_click = false  
+        });} else {
+          svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
+          to_click = true
+        }
       };
 
       //var invisible = svg.append("g").attr("class", "invisible");
 
-      //invisible.on('clicked', svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`));
-    
-      }
+      //var selection = svg.selectAll('circle').filter("." + geo_id_this);
+      //return [geo_id_this, translate_this]
+     
+
+    // var gather = function(geo_id_this, translate_this){
+    //   svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
+    //   };
 
     
     // create circles
@@ -193,6 +204,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .attr('stroke-width', 0.25)
       .attr('opacity', 0.8)
       .on('click', clicked);
+      //.on('click', gather(geo_id_this, translate_this));
 
       // circles mouseover + transition
       circles.transition()
