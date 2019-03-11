@@ -1,3 +1,4 @@
+// define dimension constants
 const plot_dims = {
     map: {
         height: 900,
@@ -20,11 +21,13 @@ const plot_dims = {
     }
 }
 
+// define color scale
 var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
 var color = d3.scaleOrdinal()
   .domain([6, 5, 4, 3, 2, 1])
   .range(colorRange);
 
+// render plots
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all(['./ghana_2.geojson',
     './ghana_wb.geojson', './d3_ghana_priority.json',
@@ -42,9 +45,3 @@ document.addEventListener('DOMContentLoaded', () => {
         myBar(ghanaCount);
         })
     });
-
-
-//.catch(error => {
-//    console.log(`The following error has occured: ${error}`)
-//.catch(error => {
-//    console.log(`The following error has occured: ${error}`);
