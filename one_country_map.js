@@ -1,8 +1,3 @@
-// create svg and g blocks
-//import {geoPath, geoAlbersUsa} from 'd3-geo';
-//import {select} from 'd3-selection';
-
-// best way to load different data sets for side plots
 
 // ideas for overlapping circles
 // https://stackoverflow.com/questions/28647623/collision-overlap-detection-of-circles-in-a-d3-transition
@@ -14,29 +9,35 @@
 // one function called from promise chain
 // main function call scatter and bar in own function 
 
-document.addEventListener('DOMContentLoaded', () => {
-    Promise.all(['./ghana_2.geojson',
-    './ghana_wb.geojson'
-    ].map(url => fetch(url).then(data => data.json())))
-    .then(data => myVis(data)).catch(error => {
-          console.log(`The following error has occured: ${error}`)
-      })
-  });
+// inspiration for map:
+// http://bl.ocks.org/d3noob/9267535
+// http://bl.ocks.org/bimannie/33494479e839c3fe3735eac00be69787 
 
+// QUESTIONS
+// handling errors w/ promise all
+// multi classes w/ select
+// 
 
-function myVis(data) {
+function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
-    var [ghanaShapes, ghanaWB] = data;
-    var width = 800;
-    var height = 900;
-    var notesHeight = 100;  
-    var margin = {
-        top: 10,
-        left: 10,
-        right: 10,
-        bottom: 10
-    };
+    //var [ghanaShapes, ghanaWB, ghanaPriority] = data;
     
+
+    //var active_goal = 'None';
+    //create scatter
+    //myScatter(ghanaPriority);
+
+    console.log(ghanaPriority);
+
+    var goal_dict = {};
+
+    ghanaPriority.forEach(d => goal_dict[d.goal] = d.six_overall_rating)
+
+    //var goal_dict = ghanaPriority(function(d){return {d.goal : d.six_overall_rating}; });
+
+
+    console.log(goal_dict);
+
     // add leaflet LatLng feature and define variables for project data
     ghanaWB.features.forEach(function(d) {
       d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
@@ -48,9 +49,11 @@ function myVis(data) {
       d.end = d.properties.end_actual_isodate
       d.perf_cat = d.properties.performance_cat
       d.sdg = d.properties.goal
+      d.sdg_name = d.properties.goal_name
+      d.geoid = d.properties.geoname_id
      });
      
-     console.log(ghanaWB)
+    console.log(ghanaWB)
 
     var shapeStyle = {
       "color": "#6A6A6A",
@@ -64,15 +67,29 @@ function myVis(data) {
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
         //L.geoJSON(ghanaWB).addTo(map);
     
+
+
+
+    
+
+    //legend.addTo(map);
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-    // define color scale for project performance
-    var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
-    var color = d3.scaleOrdinal()
-      .domain([6, 5, 4, 3, 2, 1])
-      .range(colorRange);
+  //  // create legend
+  //  var colorLegend = d3.legend.color()
+  //       .labelFormat(d3.format(".0f"))
+  //       .scale(color)
+  //       .shapePadding(5)
+  //       .shapeWidth(50)
+  //       .shapeHeight(20)
+  //       .labelOffset(12);
+
+    // svg.append("g")
+    //     .attr("transform", `translate(500, ${plot_dims.map.height - 100})`)
+    //     .call(colorLegend);
+  
 
     //tooltip + mouseover
 
@@ -84,12 +101,12 @@ function myVis(data) {
     var tipMouseover = function(d) {
 
       var funding = d3.format("($,.2f")(d.funding)
-      var cl = color(d.six_overall_rating);
+      var cl = color(d.performance);
       var html  = "<b>Title:</b> " + d.title + "<br/>" +
                     "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
                   "<b>Funding:</b> " + funding + "<br/>" +
                   "<b>Performance:<span style='color:" + cl + ";'> " +  d.perf_cat + "</span></b><br/>" +
-                  "<b>Goal:</b> " + d.sdg;
+                  "<b>Goal:</b> " + d.sdg_name;
 
       tooltip.html(html)
           .attr("padding", 3 + "px")
@@ -110,32 +127,149 @@ function myVis(data) {
 
     // function to change color of project locations on hover
     var onColor = function(d) {
-      svg.selectAll("." + this.getAttribute('class'))
+      //svg.selectAll("." + this.getAttribute('class'))
+      svg.selectAll('circle').filter("." + this.getAttribute('projid'))
       .style("fill", "#E31480")
       .style("opacity", .9);
+    }
 
+    var onGoal = function(d) {
+      d3.select("#" + d.sdg)
+      .style("fill", "#E31480")
+      .style("opacity", .9);
+    }
+
+    var onPerf = function(d) {
+      d3.select("#cat_" + d.performance)
+      .style("stroke", "#E31480")
+      .style("opacity", .9);
     }
 
     var outColor = function(d) {
-      svg.selectAll("." + this.getAttribute('class'))
+      //svg.selectAll("." + this.getAttribute('class'))
+      svg.selectAll('circle').filter("." + this.getAttribute('projid'))
       .style("fill",  d => color(d.performance))
-      .style("opacity", .6);
-
+      .style("opacity", .8);
     }
 
+    var outGoal = function(d) {
+      d3.select("#" + d.sdg)
+      .style("fill", color(goal_dict[d.sdg]))
+      .style("opacity", .8);
+    }
+
+    var outPerf = function(d) {
+      d3.select("#cat_" + d.performance)
+      .style("stroke", color(d.performance))
+      .style("opacity", .7);
+    }
+
+
+    var clicked = function (d) {
+      // Zoom to selected project on the map
+      map.setView(L.latLng(d.LatLng), 11);
+
+      // get current geoid
+      var geo_id_this = this.getAttribute('geoid');
+      console.log(geo_id_this)
+      var translate_this = this.getAttribute('transform');
+      console.log(translate_this[0])
+    
+
+      // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
+      var parse = function (a){
+        var b={};
+        for (var i in a = a.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g))
+        {
+            var c = a[i].match(/[\w\.\-]+/g);
+            b[c.shift()] = c;
+        }
+        return b;
+    }
+      var trans_parse = parse(translate_this)
+
+      console.log(trans_parse)
+      // filter data to current geoid
+      // resource: http://learnjsdata.com/iterate_data.html
+      // var d_filter = ghanaWB.filter(function(d) { return d.geoid === geo_id_this; }).sort(function(a,b) {
+      //   return b.funding - a.funding;
+      // });
+      var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
+      console.log(d_filter)
+
+      //var selection = svg.selectAll('circle').filter("." + this.getAttribute('geoid'))
+      //  .style("fill", "yellow");
+
+      //console.log(d_filter)
+      var max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
+      var len = Object.keys(d_filter).length;
+      //console.log(max_rad)
+      var theta = (2*Math.PI)/len;
+      //console.log(theta)
+
+      d_filter.forEach(function(d, i) {
+          var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
+          //console.log(x_tran)
+          var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
+          //console.log(y_tran);
+          var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
+          //var proj_select = selection.filter("." + d.id)
+          .attr("transform", `translate(${x_tran}, ${y_tran})`);   
+          console.log(`translate(${x_tran}, ${y_tran})`)     
+        });
+
+      var invisible = svg.append("g").attr("class", "invisible");
+
+      invisible.on('clicked', svg.selectAll('circle').filter(".G" + geo_id_this).attr("transform", `${translate_this}`));
+    
+      }
+
+      //map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
+      //map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
+      //})
+       // [r_new*sin(theta*i), r_new*cos(theta*i)]
+      //.forEach(function(d) {
+
+        // store current latlng as variable
+       // const cur_latlng = d.LatLng
+        // find circle with max radius
+
+        // const max_rad = selection.reduce((acc, row) => {
+        //   return {
+        //     min: Math.min(row.count, acc.min),
+        //   };)
+        // define r_new = max radius * 2
+        // define theta = 2*Math.PI/ num item in selection
+        // in order of size radius, update d.LatLong = [r_new*sin(theta*i), r_new*cos(theta*i)]
+        // Math.sin, radians convert theta to radian 2*pi radians in circle 
+        // use transform translate a la this http://bl.ocks.org/cartoda/035f893cd5fc86bb955f
+        
+        // append invisible div
+        // on click of div, return to normal
+        // css class for invisible div w 4 properties top: 0, left:0, bottom:0, right:0, positon:absolute
+
+      
+
+      // on second click, update LatLng of all objects to be old latlong using variable
+
+
+      //𝑥=𝑟sin𝜃, 𝑦=𝑟cos𝜃.
+
+    
     // create circles
     var circles=  g.selectAll('circle')
       .data(ghanaWB.features)
       .enter()
       .append('circle')
-      .attr("class", function(d) { return d.id; })
-
+      //.attr("class", function(d) { return d.id; })//function(d) { return d.id+" "+ d.geoid;})
+      .attr("class", function(d) { return d.id+" G"+ d.geoid;})
+      .attr("geoid", d => "G" + d.geoid)
+      .attr("projid", d => d.id)
       .attr('fill', d => color(d.performance))
       .attr('stroke', 'black')
       .attr('stroke-width', 0.25)
-      .attr('opacity', 0.60);
-
-      console.log('hi!')
+      .attr('opacity', 0.8)
+      .on('click', clicked);
 
       // circles mouseover + transition
       circles.transition()
@@ -146,21 +280,22 @@ function myVis(data) {
       circles.on("mouseover", function(d) {
         tipMouseover(d);
         onColor.call(this, d);
+        onGoal.call(this, d);
+        onPerf.call(this, d);
       });
       circles.on("mouseout", function(d) {
         tipMouseout(d);
         outColor.call(this, d);
+        outGoal.call(this, d);
+        outPerf.call(this, d);
       });
+    
+    
 
     //https://leafletjs.com/reference-1.4.0.html#circle  
     var transform = d3.geoTransform({point: projectPoint});
 
     var path = d3.geoPath().projection(transform);
-
-    
-    
-    //map.on("viewreset", update);
-		//update();
   
     function projectPoint(x, y) {
 			var point = map.latLngToLayerPoint(new L.LatLng(y, x));
@@ -172,7 +307,6 @@ function myVis(data) {
     update();
     
     function update() {
-      console.log('map was reset')
 
       var bounds = path.bounds(ghanaWB),
          topLeft = bounds[0],
@@ -195,63 +329,10 @@ function myVis(data) {
           map.latLngToLayerPoint(d.LatLng).x +","+ 
           map.latLngToLayerPoint(d.LatLng).y +")";
       });
-
-      var scatterWidth = 430;
-  var scatterHeight= 360;
-  var scatterMargin = {
-    top: 10,
-    left: 10,
-    right: 10,
-    bottom: 10
 };
 
-    }
+}
       
-}  
 
-
-
-
-
-var scatterWidth = 430;
-var scatterHeight= 360;
-var scatterMargin = {
-    top: 10,
-    left: 10,
-    right: 10,
-    bottom: 10};
-
-var svg1 = d3.select('#proj_highlight')
-    .append('svg')
-    .attr('width', scatterWidth)
-    .attr('height', scatterHeight);
-
-var g1= svg1.append("g")
-    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
-    
-var note  = g1.append("text")             
-       .attr("transform",
-       "translate(" + (scatterMargin.left) + " ," + 
-                       (scatterHeight/2 + scatterMargin.top ) + ")")
-           .style("text-anchor", "left")
-           .text("A scatter plot will live here")
-           .style("font-family", '"Lucida Console", monospace')
-           .style("font-size", "14px");
-
-var svg2 = d3.select('#proj_highlight')
-    .append('svg')
-    .attr('width', scatterWidth)
-    .attr('height', scatterHeight)
-    .attr('top', scatterHeight + 5);
-
-var g2= svg2.append("g")
-    .attr("transform", "translate(" + scatterMargin.left + "," + scatterMargin.top + ")");
-    
-var note2  = g2.append("text")             
-      .attr("transform",
-      "translate(" + (scatterMargin.left) + " ," + 
-                      (scatterHeight/2 + scatterMargin.top ) + ")")
-          .style("text-anchor", "left")
-          .text("A bar plot will live here")
-          .style("font-family", '"Lucida Console", monospace')
-          .style("font-size", "14px");
+// idea for circles https://codepen.io/eesur/pen/KcDHj
+// calculating circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
