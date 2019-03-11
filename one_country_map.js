@@ -1,31 +1,12 @@
 
-// ideas for overlapping circles
-// https://stackoverflow.com/questions/28647623/collision-overlap-detection-of-circles-in-a-d3-transition
-// https://bl.ocks.org/mbostock/1093130
-
-// preturbation on points, put on wheel - which is biggest, set radius to be double largest, divide up wedge space based on 
-// number, they'll all fit (similar to b)
-
-// one function called from promise chain
-// main function call scatter and bar in own function 
-
 // inspiration for map:
 // http://bl.ocks.org/d3noob/9267535
 // http://bl.ocks.org/bimannie/33494479e839c3fe3735eac00be69787 
 
 // QUESTIONS
 // handling errors w/ promise all
-// multi classes w/ select
-// 
 
 function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
-
-    //var [ghanaShapes, ghanaWB, ghanaPriority] = data;
-    
-
-    //var active_goal = 'None';
-    //create scatter
-    //myScatter(ghanaPriority);
 
     console.log(ghanaPriority);
 
@@ -65,31 +46,10 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var map = L.map('map', { center: [7.5, -1.2], zoom:7}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
-        //L.geoJSON(ghanaWB).addTo(map);
     
-
-
-
-    
-
-    //legend.addTo(map);
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
-
-  //  // create legend
-  //  var colorLegend = d3.legend.color()
-  //       .labelFormat(d3.format(".0f"))
-  //       .scale(color)
-  //       .shapePadding(5)
-  //       .shapeWidth(50)
-  //       .shapeHeight(20)
-  //       .labelOffset(12);
-
-    // svg.append("g")
-    //     .attr("transform", `translate(500, ${plot_dims.map.height - 100})`)
-    //     .call(colorLegend);
-  
 
     //tooltip + mouseover
 
@@ -188,25 +148,19 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     }
       var trans_parse = parse(translate_this)
 
-      console.log(trans_parse)
       // filter data to current geoid
       // resource: http://learnjsdata.com/iterate_data.html
-      // var d_filter = ghanaWB.filter(function(d) { return d.geoid === geo_id_this; }).sort(function(a,b) {
-      //   return b.funding - a.funding;
-      // });
       var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
-      console.log(d_filter)
 
-      //var selection = svg.selectAll('circle').filter("." + this.getAttribute('geoid'))
-      //  .style("fill", "yellow");
-
-      //console.log(d_filter)
+      //define radius of spread as 2x radius of largest circle
       var max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
       var len = Object.keys(d_filter).length;
-      //console.log(max_rad)
+      //define angles as radians/ number of points in stack
       var theta = (2*Math.PI)/len;
-      //console.log(theta)
-
+     
+      //if multiple projects in same location, scatter on click
+      // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
+      if (len > 1) {
       d_filter.forEach(function(d, i) {
           var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
           //console.log(x_tran)
@@ -217,43 +171,13 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           .attr("transform", `translate(${x_tran}, ${y_tran})`);   
           console.log(`translate(${x_tran}, ${y_tran})`)     
         });
+      };
 
-      var invisible = svg.append("g").attr("class", "invisible");
+      //var invisible = svg.append("g").attr("class", "invisible");
 
-      invisible.on('clicked', svg.selectAll('circle').filter(".G" + geo_id_this).attr("transform", `${translate_this}`));
+      //invisible.on('clicked', svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`));
     
       }
-
-      //map.latLngToLayerPoint(new L.LatLng(y, x)).x + "," +
-      //map.latLngToLayerPoint(new L.LatLng(y, x)).y + ")";
-      //})
-       // [r_new*sin(theta*i), r_new*cos(theta*i)]
-      //.forEach(function(d) {
-
-        // store current latlng as variable
-       // const cur_latlng = d.LatLng
-        // find circle with max radius
-
-        // const max_rad = selection.reduce((acc, row) => {
-        //   return {
-        //     min: Math.min(row.count, acc.min),
-        //   };)
-        // define r_new = max radius * 2
-        // define theta = 2*Math.PI/ num item in selection
-        // in order of size radius, update d.LatLong = [r_new*sin(theta*i), r_new*cos(theta*i)]
-        // Math.sin, radians convert theta to radian 2*pi radians in circle 
-        // use transform translate a la this http://bl.ocks.org/cartoda/035f893cd5fc86bb955f
-        
-        // append invisible div
-        // on click of div, return to normal
-        // css class for invisible div w 4 properties top: 0, left:0, bottom:0, right:0, positon:absolute
-
-      
-
-      // on second click, update LatLng of all objects to be old latlong using variable
-
-
-      //𝑥=𝑟sin𝜃, 𝑦=𝑟cos𝜃.
 
     
     // create circles
@@ -261,7 +185,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .data(ghanaWB.features)
       .enter()
       .append('circle')
-      //.attr("class", function(d) { return d.id; })//function(d) { return d.id+" "+ d.geoid;})
       .attr("class", function(d) { return d.id+" G"+ d.geoid;})
       .attr("geoid", d => "G" + d.geoid)
       .attr("projid", d => d.id)
@@ -290,9 +213,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         outPerf.call(this, d);
       });
     
-    
-
-    //https://leafletjs.com/reference-1.4.0.html#circle  
     var transform = d3.geoTransform({point: projectPoint});
 
     var path = d3.geoPath().projection(transform);
@@ -332,7 +252,3 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 };
 
 }
-      
-
-// idea for circles https://codepen.io/eesur/pen/KcDHj
-// calculating circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
