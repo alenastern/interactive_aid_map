@@ -38,8 +38,8 @@ li {
     background-color: white;
 }
 
-.circle.active {
-    fill: yellow;
+circle{
+    animation: transform 1s;
   }
 
 .invisible {

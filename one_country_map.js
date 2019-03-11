@@ -167,15 +167,16 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           //console.log(x_tran)
           var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
           //console.log(y_tran);
-          var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
+          var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id);
           //var proj_select = selection.filter("." + d.id)
-          .attr("transform", `translate(${x_tran}, ${y_tran})`)
-          .transition()
-          .duration(1000);   // transition doesn't seem to be working
+          proj_selection.transition()
+            .duration(1000)
+            .attr("transform", `translate(${x_tran}, ${y_tran})`);   // transition doesn't seem to be working
           console.log(`translate(${x_tran}, ${y_tran})`)   
           to_click = false  
         });} else {
           svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
+          map.setView([7.5, -1.2], 7);
           to_click = true
         }
       };
