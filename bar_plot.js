@@ -61,13 +61,13 @@ function myBar(ghanaCount) {
         .attr('height', 0)
         .style("fill",  d => color(d.six_overall_rating))
         .style("stroke", d => color(d.six_overall_rating))
-        .style("stroke-width", 10)
+        .style("stroke-width", 5)
         .style("opacity", .7)
         .attr("id", d => "cat_" + d.six_overall_rating)
         .transition()
         .duration(3000)
         .attr('y', d => y(d.count))
-        .attr('height', d => plot_dims.scatter.height - y(d.count));
+        .attr('height', d => plot_dims.scatter.height - y(d.count) - 2);
         
     //add axis labels
     svg2.append('text')
