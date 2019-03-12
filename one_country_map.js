@@ -124,7 +124,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .7);
     }
 
-    var to_click = false
+    var to_click = true
 
     var clicked = function (d) {
       // Zoom to selected project on the map
