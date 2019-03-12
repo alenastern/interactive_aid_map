@@ -124,17 +124,16 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .7);
     }
 
-    var to_click = true
+    var to_click = false
 
     var clicked = function (d) {
       // Zoom to selected project on the map
-      map.setView(L.latLng(d.LatLng), 11);
+      map.setView(L.latLng(d.LatLng), 11, {animate:false});
 
       // get current geoid
       var geo_id_this = this.getAttribute('geoid');
       // get current transform 
-      var translate_this = this.getAttribute('transform');
-    
+      const translate_this = this.getAttribute('transform');
 
       // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
       var parse = function (a){
@@ -146,7 +145,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         }
         return b;
     }
-      var trans_parse = parse(translate_this)
+     
+      const trans_parse = parse(translate_this)
 
       // filter data to current geoid
       // resource: http://learnjsdata.com/iterate_data.html
@@ -162,22 +162,28 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       //if multiple projects in same location, scatter on click
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
       if (len > 1 & to_click === true) {
-      d_filter.forEach(function(d, i) {
+        d_filter.forEach(function(d, i) {
           var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
           //console.log(x_tran)
           var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
           //console.log(y_tran);
-          var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id);
+          var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
+          .transition()
+          .duration(1000)
+          .attr("transform", `translate(${x_tran}, ${y_tran})`);
+          
+          //.attr("transform", `translate(${x_tran}, ${y_tran})`);
           //var proj_select = selection.filter("." + d.id)
-          proj_selection.transition()
-            .duration(1000)
-            .attr("transform", `translate(${x_tran}, ${y_tran})`);   // transition doesn't seem to be working
+          //proj_selection.transition()
+          //  .duration(1000)
+               // transition doesn't seem to be working
           console.log(`translate(${x_tran}, ${y_tran})`)   
           to_click = false  
         });} else {
           svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
+          to_click = true;
           map.setView([7.5, -1.2], 7);
-          to_click = true
+          
         }
       };
 

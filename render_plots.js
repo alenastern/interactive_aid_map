@@ -20,7 +20,7 @@ const plot_dims = {
         }
     }
 }
-
+//var to_click = true
 // define color scale
 var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
 var color = d3.scaleOrdinal()
