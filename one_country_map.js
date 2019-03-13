@@ -157,9 +157,10 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         
             var c = a[i].match(/[\w\.\-]+/g);
             b[c.shift()] = c;
-        }
+        
         return b;
-    }
+      }
+    
      
       const trans_parse = parse(translate_this)
 
