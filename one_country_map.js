@@ -148,7 +148,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       // get current transform 
       const translate_this = this.getAttribute('transform');
       //var active = this.getAttribute('active');
-      console.log(active)
+      //console.log(active)
 
       // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
       var parse = function (a){
@@ -187,7 +187,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           .transition()
           .duration(1000)
           //.attr('stable_translate', translate_this)
-          .attr("transform", `translate(${x_tran}, ${y_tran})`);
+          .attr("transform", `translate(${x_tran}, ${y_tran})`)
           
           //.attr("transform", `translate(${x_tran}, ${y_tran})`);
           //var proj_select = selection.filter("." + d.id)
