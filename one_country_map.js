@@ -46,6 +46,18 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var map = L.map('map', { center: [7.5, -1.2], zoom:7, minZoom: 6}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
+
+
+    //referenced: https://gis.stackexchange.com/questions/127286/home-button-leaflet-map, inspired by Lauren Li
+    var home = {
+      lat: 7.5,
+      lng: -1.2,
+      zoom: 7
+      };
+  
+    L.easyButton('fa-home',function(btn,map){
+      map.setView([home.lat, home.lng], home.zoom);
+    },'Return to Country View').addTo(map);
     
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
@@ -128,12 +140,15 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     var clicked = function (d) {
       // Zoom to selected project on the map
-      map.setView(L.latLng(d.LatLng), 11, {animate:false});
+      map.setView(L.latLng(d.LatLng), 11, {animate:false, duration:1});
 
       // get current geoid
       var geo_id_this = this.getAttribute('geoid');
+
       // get current transform 
       const translate_this = this.getAttribute('transform');
+      //var active = this.getAttribute('active');
+      console.log(active)
 
       // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
       var parse = function (a){
@@ -159,17 +174,19 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       //define angles as radians/ number of points in stack
       var theta = (2*Math.PI)/len;
      
+      
       //if multiple projects in same location, scatter on click
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
       if (len > 1 & to_click === true) {
         d_filter.forEach(function(d, i) {
           var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
-          //console.log(x_tran)
           var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
-          //console.log(y_tran);
+         
           var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
+          //.attr('active', true)
           .transition()
           .duration(1000)
+          //.attr('stable_translate', translate_this)
           .attr("transform", `translate(${x_tran}, ${y_tran})`);
           
           //.attr("transform", `translate(${x_tran}, ${y_tran})`);
@@ -180,9 +197,16 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           console.log(`translate(${x_tran}, ${y_tran})`)   
           to_click = false  
         });} else {
-          svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
+          //var translate_back = this.getAttribute('stable_translate');
+          svg.selectAll('circle').filter("." + geo_id_this)
+          .transition()
+          .duration(1000)
+          .attr("transform", `${translate_this}`);
+          //.attr('active', false);
+         //.attr("stable_translate", 0);
+
           to_click = true;
-          map.setView([7.5, -1.2], 7);
+          //map.setView([7.5, -1.2], 7);
           
         }
       };
@@ -210,6 +234,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .attr('stroke', 'black')
       .attr('stroke-width', 0.25)
       .attr('opacity', 0.8)
+      .attr('active', false)
+      .attr('stable_translate', 0)
       .on('click', clicked);
       //.on('click', gather(geo_id_this, translate_this));
 
