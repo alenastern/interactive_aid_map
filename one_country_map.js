@@ -154,7 +154,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       var parse = function (a){
         var b={};
         for (var i in a = a.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g))
-        {
+        
             var c = a[i].match(/[\w\.\-]+/g);
             b[c.shift()] = c;
         }
@@ -190,10 +190,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           .attr("transform", `translate(${x_tran}, ${y_tran})`)
           
           //.attr("transform", `translate(${x_tran}, ${y_tran})`);
-          //var proj_select = selection.filter("." + d.id)
-          //proj_selection.transition()
-          //  .duration(1000)
-               // transition doesn't seem to be working
           console.log(`translate(${x_tran}, ${y_tran})`)   
           to_click = false  
         });} else {
