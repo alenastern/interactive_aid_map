@@ -58,6 +58,55 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     L.easyButton('fa-home',function(btn,map){
       map.setView([home.lat, home.lng], home.zoom);
     },'Return to Country View').addTo(map);
+
+    //https://leafletjs.com/examples/choropleth/
+    var legend = L.control({position: 'bottomleft'});
+
+    legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [1, 2, 3, 4, 5, 6],
+        labels = ['Highly Unsatisfactory', 'Unsatisfactory', 'Marginally Unsatisfactory', 'Marginally Satisfactory',
+        'Satisfactory', 'Highly Satisfactory'];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + color(grades[i]) + '"></i> ' + labels[i] + '<br/>'
+    }
+
+    return div;
+    };
+
+    legend.addTo(map);
+
+    var circ_legend = L.control({position: 'topleft'});
+
+    circ_legend.onAdd = function (map) {
+
+    var div2 = L.DomUtil.create('div', 'info legend'),
+        labels = ['$10M', '$20M', '$100M', '$200M'];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+        div2.innerHTML = 
+        
+        '<div class = "row" style="display: table-row;"><i class="circle4" style="background:black"></i>' + '<span class="legend row">' + labels[0] + '</span></div>' +
+        '<div class = "row" style="display: table-row;"><i class="circle3" style="background:black"></i>'  + '<span class="legend row">' + labels[1] + '</span></div>' +
+        '<div class = "row" style="display: table-row;"><i class="circle2" style="background:black"></i>'  + '<span class="legend row">' + labels[2] + '</span></div>' +
+        '<div class = "row" style="display: table-row;"><i class="circle1" style="background:black"></i>'  + '<span class="legend row">' + labels[3] + '</span></div>' 
+
+            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle4" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $10M </span></div>' + '<br/></div>'+ 
+            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle3" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $20M </span></div>'  + '<br/></div>'+ 
+            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle2" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $100M </span></div>'  + '<br/></div>'+ 
+            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle1" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $200M </span></div></div>' 
+
+    
+            // '<i class="circle" style="background:' + getColor(categories[i]) + '"></i> ' +
+            // (categories[i] ? categories[i] + '<br>' : '+');
+    return div2;
+    };
+
+    circ_legend.addTo(map);
     
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
@@ -77,7 +126,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       var html  = "<b>Title:</b> " + d.title + "<br/>" +
                     "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
                   "<b>Funding:</b> " + funding + "<br/>" +
-                  "<b>Performance:<span style='color:" + cl + ";'> " +  d.perf_cat + "</span></b><br/>" +
                   "<b>Goal:</b> " + d.sdg_name;
 
       tooltip.html(html)
@@ -101,7 +149,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var onColor = function(d) {
       //svg.selectAll("." + this.getAttribute('class'))
       svg.selectAll('circle').filter("." + this.getAttribute('projid'))
-      .style("fill", "#E31480")
+      .style("stroke", "#E31480")
+      .attr('stroke-width', 3)
       .style("opacity", .9);
     }
 
@@ -120,7 +169,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var outColor = function(d) {
       //svg.selectAll("." + this.getAttribute('class'))
       svg.selectAll('circle').filter("." + this.getAttribute('projid'))
-      .style("fill",  d => color(d.performance))
+      .style("stroke",  'black')
+      .attr('stroke-width', 0.25)
       .style("opacity", .8);
     }
 

@@ -38,6 +38,7 @@ li {
     height: auto;
     pointer-events: none;
     background-color: white;
+    padding: 5px;
 }
 
 circle{
@@ -82,3 +83,120 @@ circle{
     font-family: "Lucida Console", monospace; 
     z-index:999;
 }
+
+.info {
+    padding: 6px 8px;
+    font-family: "Lucida Console", monospace;
+    font-size: 12px;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.legend {
+    line-height: 18px;
+    color: #000000;
+}
+
+.legend i {
+    display: block;
+    clear: both;
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+
+.legend .row i {
+    text-align: center; 
+    vertical-align: middle;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+.legend .row {
+    text-align: center; 
+    vertical-align: middle;
+}
+/*.circle_legend i {
+    display: block;
+    clear: both;
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}*/
+
+ 
+  /*.legend-circ{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .legend .details{
+    display: flex;
+    flex-direction: column;
+  }*/
+
+  .legend .circle1 {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    size: 40px;
+    stroke: #000000;
+    color: #000000;
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+
+.legend .circle2 {
+    position: relative;
+    left: 5px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    size: 28px;
+    margin-top: 2px;
+    vertical-align: middle;
+    stroke: #000000;
+    color: #000000;
+  }
+
+.legend .circle3 {
+    vertical-align: middle;
+    position: relative;
+    left: 9px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    size: 20px;
+    margin-top: 2px;
+    stroke: #000000;
+    color: #000000;
+  }
+
+.legend .circle4 {
+    vertical-align: middle;
+    position: relative;
+    left: 13px;
+    border-radius: 50%;
+    width: 9px;
+    height: 9px;
+    margin-top: 2px;
+    size: 9px;
+    stroke: #000000;
+    color: #000000;
+  }

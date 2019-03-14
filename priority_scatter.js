@@ -38,6 +38,45 @@ function myScatter(ghanaPriority) {
         .attr('height', plot_dims.scatter.height)
         .attr('width', plot_dims.scatter.width)
 
+    var tooltip = d3.select('svg').append("div")
+        .attr("padding", 10 + "px")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+
+    var tipMouseover = function(d) {
+
+            var html  = "<b>Goal:</b> " + d.goal_name;
+      
+            tooltip.html(html)
+                .attr("padding", 3 + "px")
+                .style("left", (d3.event.pageX + 15) + "px")
+                .style("top", (d3.event.pageY - 28) + "px")
+                .style("z-index", "999")
+                .transition()
+                  .duration(200) 
+                  .style("opacity", .9) 
+          };
+      
+          // tooltip mouseout event handler
+          var tipMouseout = function(d) {
+            tooltip.transition()
+                .duration(300) 
+                .style("opacity", 0);
+          };
+
+    var onGoal = function(d) {
+        d3.select("#" + d.goal)
+        .style("fill", "#E31480")
+        .style("opacity", .9);
+        }
+
+    var outGoal = function(d) {
+            d3.select("#" + d.sdg)
+            .style("fill", color(goal_dict[d.sdg]))
+            .style("opacity", .8);
+          }
+
     // add circles, transition, mouseover
     const circles = chart.selectAll(".circle")
                  .data(ghanaPriority)     
@@ -47,10 +86,22 @@ function myScatter(ghanaPriority) {
                  .attr("cx", d => x(d.donor_priority))
                  .attr("cy", d => y(d.leader_priority))
                  .style("fill", d => color(d.six_overall_rating))
+                 .attr('stroke', 'black')
+                 .attr('stroke-width', 0.25)
             
             circles.transition()
                     .duration(3000)
                     .attr("r", 8);
+
+            // circles.on("mouseover", function(d) {
+            //     tipMouseover(d);
+            //     onGoal.call(this, d);
+            //     });
+            // circles.on("mouseout", function(d) {
+            //         tipMouseout(d);
+            //         outColor.call(this, d);
+            //         outGoal.call(this, d);
+            //       });
 
     svg1.append('text')
         .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
