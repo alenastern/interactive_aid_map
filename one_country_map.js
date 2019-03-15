@@ -1,5 +1,4 @@
-
-// inspiration for map:
+// overall inspiration for map:
 // http://bl.ocks.org/d3noob/9267535
 // http://bl.ocks.org/bimannie/33494479e839c3fe3735eac00be69787 
 
@@ -10,11 +9,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var goal_dict = {};
 
     ghanaPriority.forEach(d => goal_dict[d.goal] = d.six_overall_rating)
-
-    //var goal_dict = ghanaPriority(function(d){return {d.goal : d.six_overall_rating}; });
-
-
-    console.log(goal_dict);
 
     // add leaflet LatLng feature and define variables for project data
     ghanaWB.features.forEach(function(d) {
@@ -33,6 +27,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
      
     console.log(ghanaWB)
 
+     // style polygon layer
     var shapeStyle = {
       "color": "#6A6A6A",
       "weight": 3,
@@ -51,9 +46,11 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       lng: -1.2,
       zoom: 7
       };
-  
+    
+    // reset to_click to true when return home
     L.easyButton('fa-home',function(btn,map){
       map.setView([home.lat, home.lng], home.zoom);
+      to_click = true;
     },'Return to Country View').addTo(map);
 
     // Color Legend
@@ -77,7 +74,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     legend.addTo(map);
 
-    // Create Circle Legend
+    // Circle Legend
     var circ_legend = L.control({position: 'topleft'});
 
     circ_legend.onAdd = function (map) {
@@ -97,7 +94,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     circ_legend.addTo(map);
 
-    // Add Info Tooltip
+    //Add Info Tooltip
     //inspired by: https://leafletjs.com/examples/choropleth/
     var info = L.control();
 
@@ -107,7 +104,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         return this._div;
     };
 
-    // method that we will use to update the control based on feature properties passed
+    // Info text
     info.update = function (d) {
         this._div.innerHTML = '<h4> Development Project Explorer</h4>' +  (d ?
           "<b>Title:</b> " + d.title + "<br/>" +
@@ -123,10 +120,9 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
+    //mouseover
     var tipMouseover = function(d) {
-
       info.update(d);
-  
     };
 
     // tooltip mouseout event handler
@@ -134,7 +130,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       info.update();
     };
 
-    // function to change color of project locations on hover
+    // function to change color of project locations stroke on hover
     var onColor = function(d) {
       svg.selectAll('circle').filter("." + this.getAttribute('projid'))
       .style("stroke", "#E31480")
@@ -142,6 +138,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .9);
     }
 
+    // function to change color of scatter point stroke on hover
     var onGoal = function(d) {
       d3.select("#" + d.sdg)
       .style("stroke", "#E31480")
@@ -149,6 +146,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .9);
     }
 
+    // function to change color of performance rect stroke on hover
     var onPerf = function(d) {
       d3.select("#cat_" + d.performance)
       .style("stroke", "#E31480")
@@ -178,6 +176,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     // dummy variable True = project not yet clicked
     var to_click = true
 
+    // function on click of project location
     var clicked = function (d) {
       // Zoom to selected project on the map
       map.setView(L.latLng(d.LatLng), 11, {animate:false, duration:1});
@@ -201,7 +200,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       // parse translate text
       const trans_parse = parse(translate_this)
 
-      // filter data to project locations at current geoid
+      // filter data to project locations at current geoid, sort in descending order by funding
       // resource: http://learnjsdata.com/iterate_data.html
       var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
 
@@ -219,9 +218,11 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
       if (len > 1 & to_click === true) {
         d_filter.forEach(function(d, i) {
+          // identify new x and y translation
           var x_tran = max_rad*Math.sin(theta*i) + +trans_parse.translate[0];
           var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
          
+          // scatter points
           var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
             .transition()
             .duration(1000)
@@ -234,6 +235,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
         // case if project already clicked
         });} else {
+
+          // restore points to previous location
           svg.selectAll('circle').filter("." + geo_id_this)
           .transition()
           .duration(1000)
