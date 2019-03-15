@@ -36,7 +36,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     //create leaflet map
     var map = L.map('map', { center: [8.2, -1.2], zoom:7, minZoom: 6}); 
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
+        L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
 
     // Home Button
