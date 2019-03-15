@@ -49,8 +49,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     
     // reset to_click to true when return home
     L.easyButton('fa-home',function(btn,map){
-      map.setView([home.lat, home.lng], home.zoom);
       to_click = true;
+      map.setView([home.lat, home.lng], home.zoom);
     },'Return to Country View').addTo(map);
 
     // Color Legend
