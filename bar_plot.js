@@ -3,11 +3,11 @@ function myBar(ghanaCount) {
     console.log(ghanaCount);
 
     // append svg and g for plot
-    var svg2 = d3.select('#proj_highlight')
+    var svg2 = d3.select('#bar')
     .append('svg')
     .attr('width', plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)
     .attr('height', plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)
-    .attr('y', 355 + "px");
+    //.attr('y', 355 + "px");
 
     var g2= svg2.append("g")
     .attr("transform", `translate(20, ${plot_dims.scatter.margin.top})`);
@@ -61,7 +61,7 @@ function myBar(ghanaCount) {
         .attr('height', 0)
         .style("fill",  d => color(d.six_overall_rating))
         .style("stroke", d => color(d.six_overall_rating))
-        .style("stroke-width", 5)
+        .style("stroke-width", 3)
         .style("opacity", .7)
         .attr("id", d => "cat_" + d.six_overall_rating)
         .transition()
@@ -86,4 +86,17 @@ function myBar(ghanaCount) {
         .text('Performance Rating')
         .style("font-family",'"Lucida Console", monospace')
         .style("font-size", "12px");
-}
+
+    //http://bl.ocks.org/williaster/10ef968ccfdc71c30ef8
+    //https://stackoverflow.com/questions/24193593/d3-how-to-change-dataset-based-on-drop-down-box-selection
+//     var dropdown = d3.select("#proj_highlight")
+//         .insert("select", "svg")
+//         .on("change", dropdownChange);
+
+//     var dropdownChange = function(d){
+
+//     }
+//     dropdown.selectAll("option")
+//                     .text('Performance'); 
+
+ }

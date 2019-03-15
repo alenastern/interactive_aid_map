@@ -4,7 +4,7 @@ function myScatter(ghanaPriority) {
     console.log(ghanaPriority)
         
     // create SVG and G for scatterplot
-    var svg1 = d3.select('#proj_highlight')
+    var svg1 = d3.select('#scatter')
     .append('svg')
     .attr('width', plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)
     .attr('height', plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top);
@@ -38,10 +38,13 @@ function myScatter(ghanaPriority) {
         .attr('height', plot_dims.scatter.height)
         .attr('width', plot_dims.scatter.width)
 
-    var tooltip = d3.select('svg').append("div")
-        .attr("padding", 10 + "px")
-        .attr("class", "tooltip")
+    var tooltip = d3.select("body").append("div")	
+        .attr("class", "tooltip")	
+        .attr("padding", 10 + "px")			
         .style("opacity", 0);
+    
+    
+
 
 
     var tipMouseover = function(d) {
@@ -64,17 +67,18 @@ function myScatter(ghanaPriority) {
                 .duration(300) 
                 .style("opacity", 0);
           };
+    
 
     var onGoal = function(d) {
-        d3.select("#" + d.goal)
-        .style("fill", "#E31480")
-        .style("opacity", .9);
+        d3.selectAll("." + d.goal)
+        .style("stroke", "#E31480")
+        .attr('stroke-width', 3);
         }
 
     var outGoal = function(d) {
-            d3.select("#" + d.sdg)
-            .style("fill", color(goal_dict[d.sdg]))
-            .style("opacity", .8);
+            d3.selectAll("." + d.goal)
+            .style("stroke", 'black')
+            .attr('stroke-width', 0.25);
           }
 
     // add circles, transition, mouseover
@@ -82,6 +86,7 @@ function myScatter(ghanaPriority) {
                  .data(ghanaPriority)     
                  .enter() 
                  .append("circle")	
+                 .attr("class", d => d.goal)
                  .attr("id", d => d.goal)
                  .attr("cx", d => x(d.donor_priority))
                  .attr("cy", d => y(d.leader_priority))
@@ -93,15 +98,34 @@ function myScatter(ghanaPriority) {
                     .duration(3000)
                     .attr("r", 8);
 
-            // circles.on("mouseover", function(d) {
-            //     tipMouseover(d);
-            //     onGoal.call(this, d);
-            //     });
-            // circles.on("mouseout", function(d) {
-            //         tipMouseout(d);
-            //         outColor.call(this, d);
-            //         outGoal.call(this, d);
-            //       });
+            circles.on("mouseover", function(d) {
+                tipMouseover(d);
+                onGoal.call(this, d);
+                });
+            circles.on("mouseout", function(d) {
+                    tipMouseout(d);
+                    outGoal.call(this, d);
+                  });
+
+    //http://bl.ocks.org/jalapic/cf35b0212d18993ca07c
+    chart.append("line")
+        .attr("x1", x(1))
+        .attr("y1", y(1))
+        .attr("x2", x(18))
+        .attr("y2", y(18))
+        .attr("stroke-width", 2)
+        .attr("stroke", "#4CA145")
+        .attr("stroke-dasharray", "5,5");
+
+    // chart.append('text')
+    //     .attr('x', 250)
+    //     .attr('y', 250)
+    //     .attr('transform', 'rotate(-45)')
+    //     .attr('text-anchor', 'middle')
+    //     .text('Equal Leader and Donor Priority')
+    //     .style("font-family",'"Lucida Console", monospace')
+    //     .style("font-size", "9px")
+    //     .style("color", "#4CA145");
 
     svg1.append('text')
         .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
@@ -117,6 +141,15 @@ function myScatter(ghanaPriority) {
         .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
         .attr('text-anchor', 'middle')
         .text('Donor Priority Ranking')
+        .style("font-family",'"Lucida Console", monospace')
+        .style("z-index", "999")
+        .style("font-size", "12px");
+
+    svg1.append('text')
+        .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
+        .attr('y', plot_dims.scatter.margin.top  - 16)
+        .attr('text-anchor', 'middle')
+        .text('SDG by Donor and Leader Priority')
         .style("font-family",'"Lucida Console", monospace')
         .style("font-size", "12px");
             

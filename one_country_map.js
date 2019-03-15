@@ -3,9 +3,6 @@
 // http://bl.ocks.org/d3noob/9267535
 // http://bl.ocks.org/bimannie/33494479e839c3fe3735eac00be69787 
 
-// QUESTIONS
-// handling errors w/ promise all
-
 function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     console.log(ghanaPriority);
@@ -43,14 +40,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
   };
 
     //create leaflet map
-    var map = L.map('map', { center: [7.5, -1.2], zoom:7, minZoom: 6}); 
+    var map = L.map('map', { center: [8.2, -1.2], zoom:7, minZoom: 6}); 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
 
-
-    //referenced: https://gis.stackexchange.com/questions/127286/home-button-leaflet-map, inspired by Lauren Li
+    // Home Button
+    //referenced: https://gis.stackexchange.com/questions/127286/home-button-leaflet-map, inspired by Lauren Li presentation
     var home = {
-      lat: 7.5,
+      lat: 8.2,
       lng: -1.2,
       zoom: 7
       };
@@ -59,27 +56,28 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       map.setView([home.lat, home.lng], home.zoom);
     },'Return to Country View').addTo(map);
 
+    // Color Legend
     //https://leafletjs.com/examples/choropleth/
     var legend = L.control({position: 'bottomleft'});
 
     legend.onAdd = function (map) {
 
-    var div = L.DomUtil.create('div', 'info legend'),
-        grades = [1, 2, 3, 4, 5, 6],
-        labels = ['Highly Unsatisfactory', 'Unsatisfactory', 'Marginally Unsatisfactory', 'Marginally Satisfactory',
-        'Satisfactory', 'Highly Satisfactory'];
+      var div = L.DomUtil.create('div', 'info legend'),
+          grades = [1, 2, 3, 4, 5, 6],
+          labels = ['Highly Unsatisfactory', 'Unsatisfactory', 'Marginally Unsatisfactory', 'Marginally Satisfactory',
+          'Satisfactory', 'Highly Satisfactory'];
 
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + color(grades[i]) + '"></i> ' + labels[i] + '<br/>'
-    }
+      for (var i = 0; i < grades.length; i++) {
+          div.innerHTML +=
+              '<div class = "row"><i style="background:' + color(grades[i]) + '"></i> ' + labels[i]+ '</div>'
+      }
 
     return div;
     };
 
     legend.addTo(map);
 
+    // Create Circle Legend
     var circ_legend = L.control({position: 'topleft'});
 
     circ_legend.onAdd = function (map) {
@@ -87,67 +85,57 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     var div2 = L.DomUtil.create('div', 'info legend'),
         labels = ['$10M', '$20M', '$100M', '$200M'];
 
-    // loop through our density intervals and generate a label with a colored square for each interval
         div2.innerHTML = 
         
-        '<div class = "row" style="display: table-row;"><i class="circle4" style="background:black"></i>' + '<span class="legend row">' + labels[0] + '</span></div>' +
-        '<div class = "row" style="display: table-row;"><i class="circle3" style="background:black"></i>'  + '<span class="legend row">' + labels[1] + '</span></div>' +
-        '<div class = "row" style="display: table-row;"><i class="circle2" style="background:black"></i>'  + '<span class="legend row">' + labels[2] + '</span></div>' +
-        '<div class = "row" style="display: table-row;"><i class="circle1" style="background:black"></i>'  + '<span class="legend row">' + labels[3] + '</span></div>' 
+        '<div class="row" "><i class="inner-circle circle4" ></i><span class="legend inner-row">' + labels[0] + '</span></div>' +
+        '<div class="row" "><i class="inner-cirlce circle3" ></i><span class="legend inner-row">' + labels[1] + '</span></div>' +
+        '<div class="row" "><i class="inner-cirlce circle2" ></i><span class="legend inner-row">' + labels[2] + '</span></div>' +
+        '<div class="row" "><i class="inner-cirlce circle1" ></i><span class="legend inner-row">' + labels[3] + '</span></div>' 
 
-            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle4" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $10M </span></div>' + '<br/></div>'+ 
-            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle3" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $20M </span></div>'  + '<br/></div>'+ 
-            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle2" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $100M </span></div>'  + '<br/></div>'+ 
-            // '<div class= legend-circ><div class="legend-circ_circle"><i class="circle1" style="background:#000000"></i></div>' + '<div class="details"><span class="legend-circ__total"> $200M </span></div></div>' 
-
-    
-            // '<i class="circle" style="background:' + getColor(categories[i]) + '"></i> ' +
-            // (categories[i] ? categories[i] + '<br>' : '+');
     return div2;
     };
 
     circ_legend.addTo(map);
+
+    // Add Info Tooltip
+    //inspired by: https://leafletjs.com/examples/choropleth/
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); 
+        this.update();
+        return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (d) {
+        this._div.innerHTML = '<h4> Development Project Explorer</h4>' +  (d ?
+          "<b>Title:</b> " + d.title + "<br/>" +
+          "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
+          "<b>Funding:</b> " + d.funding + "<br/>" +
+          "<b>Goal:</b> " + d.sdg_name
+            : 'Hover over a project location to learn more <br/> Click on a project location to zoom');
+    };
+
+    info.addTo(map);
     
     // append svg to map, g to svg
     var svg = d3.select(map.getPanes().overlayPane).append("svg"),
         g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-    //tooltip + mouseover
-
-    var tooltip = d3.select(map.getContainer()).append("div")
-                  .attr("padding", 10 + "px")
-                  .attr("class", "tooltip")
-                  .style("opacity", 0);
-
     var tipMouseover = function(d) {
 
-      var funding = d3.format("($,.2f")(d.funding)
-      var cl = color(d.performance);
-      var html  = "<b>Title:</b> " + d.title + "<br/>" +
-                    "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
-                  "<b>Funding:</b> " + funding + "<br/>" +
-                  "<b>Goal:</b> " + d.sdg_name;
-
-      tooltip.html(html)
-          .attr("padding", 3 + "px")
-          .style("left", (d3.event.pageX + 15) + "px")
-          .style("top", (d3.event.pageY - 28) + "px")
-          .style("z-index", "999")
-          .transition()
-            .duration(200) 
-            .style("opacity", .9) 
+      info.update(d);
+  
     };
 
     // tooltip mouseout event handler
     var tipMouseout = function(d) {
-      tooltip.transition()
-          .duration(300) 
-          .style("opacity", 0);
+      info.update();
     };
 
     // function to change color of project locations on hover
     var onColor = function(d) {
-      //svg.selectAll("." + this.getAttribute('class'))
       svg.selectAll('circle').filter("." + this.getAttribute('projid'))
       .style("stroke", "#E31480")
       .attr('stroke-width', 3)
@@ -156,7 +144,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     var onGoal = function(d) {
       d3.select("#" + d.sdg)
-      .style("fill", "#E31480")
+      .style("stroke", "#E31480")
+      .attr('stroke-width', 2)
       .style("opacity", .9);
     }
 
@@ -167,7 +156,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     }
 
     var outColor = function(d) {
-      //svg.selectAll("." + this.getAttribute('class'))
       svg.selectAll('circle').filter("." + this.getAttribute('projid'))
       .style("stroke",  'black')
       .attr('stroke-width', 0.25)
@@ -176,7 +164,8 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     var outGoal = function(d) {
       d3.select("#" + d.sdg)
-      .style("fill", color(goal_dict[d.sdg]))
+      .style("stroke", 'black')
+      .attr('stroke-width', 0.25)
       .style("opacity", .8);
     }
 
@@ -186,6 +175,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .7);
     }
 
+    // dummy variable True = project not yet clicked
     var to_click = true
 
     var clicked = function (d) {
@@ -197,35 +187,34 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
       // get current transform 
       const translate_this = this.getAttribute('transform');
-      //var active = this.getAttribute('active');
-      //console.log(active)
 
       // parse function from https://stackoverflow.com/questions/17824145/parse-svg-transform-attribute-with-javascript
       var parse = function (a){
         var b={};
         for (var i in a = a.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g))
-        
             var c = a[i].match(/[\w\.\-]+/g);
             b[c.shift()] = c;
         
         return b;
       }
-    
-     
+      
+      // parse translate text
       const trans_parse = parse(translate_this)
 
-      // filter data to current geoid
+      // filter data to project locations at current geoid
       // resource: http://learnjsdata.com/iterate_data.html
       var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
 
       //define radius of spread as 2x radius of largest circle
       var max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
+
+      //get count of locations at geoid
       //https://stackoverflow.com/questions/6756104/get-size-of-json-object
       var len = Object.keys(d_filter).length;
+
       //define angles as radians/ number of points in stack
       var theta = (2*Math.PI)/len;
      
-      
       //if multiple projects in same location, scatter on click
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
       if (len > 1 & to_click === true) {
@@ -234,47 +223,34 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           var y_tran = max_rad*Math.cos(theta*i) + +trans_parse.translate[1];
          
           var proj_selection = svg.selectAll('circle').filter("." + geo_id_this).filter("." + d.id)
-          //.attr('active', true)
-          .transition()
-          .duration(1000)
-          //.attr('stable_translate', translate_this)
-          .attr("transform", `translate(${x_tran}, ${y_tran})`)
+            .transition()
+            .duration(1000)
+            .attr("transform", `translate(${x_tran}, ${y_tran})`)
           
-          //.attr("transform", `translate(${x_tran}, ${y_tran})`);
           console.log(`translate(${x_tran}, ${y_tran})`)   
+
+          // set dummy to false
           to_click = false  
+
+        // case if project already clicked
         });} else {
-          //var translate_back = this.getAttribute('stable_translate');
           svg.selectAll('circle').filter("." + geo_id_this)
           .transition()
           .duration(1000)
           .attr("transform", `${translate_this}`);
-          //.attr('active', false);
-         //.attr("stable_translate", 0);
 
+          // set dummy back to true
           to_click = true;
-          //map.setView([7.5, -1.2], 7);
           
         }
       };
-
-      //var invisible = svg.append("g").attr("class", "invisible");
-
-      //var selection = svg.selectAll('circle').filter("." + geo_id_this);
-      //return [geo_id_this, translate_this]
-     
-
-    // var gather = function(geo_id_this, translate_this){
-    //   svg.selectAll('circle').filter("." + geo_id_this).attr("transform", `${translate_this}`);
-    //   };
-
     
     // create circles
     var circles=  g.selectAll('circle')
       .data(ghanaWB.features)
       .enter()
       .append('circle')
-      .attr("class", function(d) { return d.id+" G"+ d.geoid;})
+      .attr("class", function(d) { return d.id+" G"+ d.geoid + " " + d.sdg;})
       .attr("geoid", d => "G" + d.geoid)
       .attr("projid", d => d.id)
       .attr('fill', d => color(d.performance))
@@ -284,7 +260,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .attr('active', false)
       .attr('stable_translate', 0)
       .on('click', clicked);
-      //.on('click', gather(geo_id_this, translate_this));
 
       // circles mouseover + transition
       circles.transition()

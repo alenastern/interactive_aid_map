@@ -45,3 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         myBar(ghanaCount);
         })
     });
+
+    // can add controls from here
+    // can just make them all siblings, don't have to do the pass then => myVis; myScatter; myBar;
+    // give function argument that relates to which column accessing, write function that has responsivenessin here that calls dropdown
+    // write function call render all visualizations, which column to use and passes to all functions (called update())
+    // call update to make initial page load happen
+    // new function create dropdown -> pass update function as argument to create dropdown
+    // dropdown has listners on options, when click option, call update function with appropriate value from option list (just do for bar plot)

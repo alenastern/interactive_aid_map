@@ -45,18 +45,10 @@ circle{
     animation: transform 1s;
   }
 
-.invisible {
-    top: 0; 
-    left:0; 
-    bottom:0; 
-    right:0; 
-    position: absolute;
-  }
-
 #map {
     display: flex;
     flex: 1;
-    height: 650px;
+    height: 550px;
     width: 725px;
 }
 
@@ -66,12 +58,31 @@ circle{
     margin-left: 10px;
 }
 
+#option_funding {
+    display: flex;
+    flex: 1;
+    height: 550px;
+    width: 725px;
+}
+
+#option_performance {
+    display: flex;
+    flex: 1;
+    height: 550px;
+    width: 725px;
+}
+
 #main {
     width: 100%;
-    height: 700px;
+    height: 650px;
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+/*#scatter{
+    position: relative;
+    margin-top: 335px;
+}*/
 
 .navbar {
     overflow: hidden;
@@ -99,10 +110,20 @@ circle{
 .legend {
     line-height: 18px;
     color: #000000;
+    display: flex;
+    flex-direction: column;
 }
 
+.row {
+    align-items: center;
+    display: flex;
+    /* height: 40px; */
+    justify-content: space-between;
+}
+
+
 .legend i {
-    display: block;
+    /* display: block; */
     clear: both;
     width: 18px;
     height: 18px;
@@ -118,12 +139,18 @@ circle{
     float: left;
     margin-right: 8px;
     opacity: 0.7;
+    background: black;
 }
 
 .legend .row {
     text-align: center; 
     vertical-align: middle;
 }
+
+#drop {
+    margin: auto;
+    width: 50px;
+  }
 /*.circle_legend i {
     display: block;
     clear: both;
