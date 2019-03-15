@@ -179,10 +179,10 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     // function on click of project location
     var clicked = function (d) {
       // Zoom to selected project on the map
-      map.setView(L.latLng(d.LatLng), 11, {animate:false, duration:1});
+      map.setView(L.latLng(d.LatLng), 11, {animate:false});
 
       // get current geoid
-      var geo_id_this = this.getAttribute('geoid');
+      const geo_id_this = this.getAttribute('geoid');
 
       // get current transform 
       const translate_this = this.getAttribute('transform');
@@ -205,14 +205,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
 
       //define radius of spread as 2x radius of largest circle
-      var max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
+      const max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
 
       //get count of locations at geoid
       //https://stackoverflow.com/questions/6756104/get-size-of-json-object
-      var len = Object.keys(d_filter).length;
+      const len = Object.keys(d_filter).length;
 
       //define angles as radians/ number of points in stack
-      var theta = (2*Math.PI)/len;
+      const theta = (2*Math.PI)/len;
      
       //if multiple projects in same location, scatter on click
       // circle math https://math.stackexchange.com/questions/260096/find-the-coordinates-of-a-point-on-a-circle
@@ -227,8 +227,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
             .transition()
             .duration(1000)
             .attr("transform", `translate(${x_tran}, ${y_tran})`)
-          
-          console.log(`translate(${x_tran}, ${y_tran})`)   
 
           // set dummy to false
           to_click = false  
