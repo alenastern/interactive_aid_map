@@ -49,7 +49,10 @@ function myScatter(ghanaPriority) {
 
     var tipMouseover = function(d) {
 
-            var html  = "<b>Goal:</b> " + d.goal_name;
+            var diff = d.donor_priority - d.leader_priority
+
+            var html  = "<b>Goal: </b> " + d.goal_name + '</br>' +
+                        "<b>Donor-Leader Ranking Difference: </b>" + diff;
       
             tooltip.html(html)
                 .attr("padding", 3 + "px")
@@ -81,6 +84,8 @@ function myScatter(ghanaPriority) {
             .attr('stroke-width', 0.25);
           }
 
+    // add donor-leader differential to tooltip
+    
     // add circles, transition, mouseover
     const circles = chart.selectAll(".circle")
                  .data(ghanaPriority)     

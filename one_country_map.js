@@ -11,15 +11,19 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     ghanaPriority.forEach(d => goal_dict[d.goal] = d.six_overall_rating)
 
     // add leaflet LatLng feature and define variables for project data
+
+    // change to commitment per location
     ghanaWB.features.forEach(function(d) {
       d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
-      d.funding = d.properties.total_commitments
+      d.funding = d.properties.even_split_commitments
+      d.total_funding = d.properties.total_commitments
       d.id = d.properties.project_id
       d.performance = d.properties.six_overall_rating
       d.title = d.properties.project_title
       d.start = d.properties.start_actual_isodate
       d.end = d.properties.end_actual_isodate
       d.perf_cat = d.properties.performance_cat
+      d.place_name = d.properties.place_name
       d.sdg = d.properties.goal
       d.sdg_name = d.properties.goal_name
       d.geoid = d.properties.geoname_id
@@ -35,14 +39,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
   };
 
     //create leaflet map
-    var map = L.map('map', { center: [8.2, -1.2], zoom:7, minZoom: 6}); 
+    var map = L.map('map', { center: [7.65, -1.2], zoom:7, minZoom: 6}); 
         L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
 
     // Home Button
     //referenced: https://gis.stackexchange.com/questions/127286/home-button-leaflet-map, inspired by Lauren Li presentation
     var home = {
-      lat: 8.2,
+      lat: 7.65,
       lng: -1.2,
       zoom: 7
       };
@@ -80,7 +84,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     circ_legend.onAdd = function (map) {
 
     var div2 = L.DomUtil.create('div', 'info legend'),
-        labels = ['$10M', '$20M', '$100M', '$200M'];
+        labels = ['$1M', '$5M', '$10M', '$25M'];
 
         div2.innerHTML = 
         
@@ -109,8 +113,9 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         this._div.innerHTML = '<h4> Development Project Explorer</h4>' +  (d ?
           "<b>Title:</b> " + d.title + "<br/>" +
           "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
-          "<b>Funding:</b> " + d.funding + "<br/>" +
-          "<b>Goal:</b> " + d.sdg_name
+          "<b>Location:</b>" + d.place_name + "<br/>" + 
+          "<b>Funding/# Locations:</b> " + d3.format("($.2f")(d.funding/1000000)+"M  " +  "<b>Total Funding: </b>" +  d3.format("($.2f")(d.total_funding/1000000)+"M" + "<br/>" +
+          "<b>Goal:</b> " + d.sdg_name 
             : 'Hover over a project location to learn more <br/> Click on a project location to zoom');
     };
 
@@ -205,7 +210,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       var d_filter = ghanaWB.features.filter(d => `G${d.geoid}` === geo_id_this).sort((a, b) => b.funding - a.funding);
 
       //define radius of spread as 2x radius of largest circle
-      const max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.000002)*2;
+      const max_rad = Math.sqrt(parseInt(d_filter[0].funding) * 0.00003)*2;
 
       //get count of locations at geoid
       //https://stackoverflow.com/questions/6756104/get-size-of-json-object
@@ -245,7 +250,13 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           
         }
       };
+
+    var bounds = [[5.85, 1.15], [4.15, 2.85]];
     
+    L.rectangle(bounds, {color: "white", weight: 3, opacity: .8, fill: true, fillColor: "white", fillOpacity: 0.3 })
+    .bindTooltip("National Projects", {permanent: true, direction: "top"}).addTo(map);
+
+
     // create circles
     var circles=  g.selectAll('circle')
       .data(ghanaWB.features)
@@ -266,7 +277,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       circles.transition()
         .duration(3000)
         .attr("r", function(d) {
-            return Math.sqrt(parseInt(d.funding) * 0.000002);
+            return Math.sqrt(parseInt(d.funding) * 0.00003);
         });
       circles.on("mouseover", function(d) {
         tipMouseover(d);
@@ -281,6 +292,17 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         outPerf.call(this, d);
       });
     
+    //var myIcon = L.divIcon({html: 'Nation-Wide Projects', className:'nationwide'});
+    //L.marker([5.6, 0.6], {icon: myIcon}).addTo(map);
+
+        // define rectangle geographical bounds
+    
+    // create an orange rectangle
+    
+    // var text = new L.marker(rect.getBounds().getSouthEast(), {opacity: 0});
+    //   text.bindLabel("Nation-Wide Projects");
+    //   text.addTo(map);
+
     var transform = d3.geoTransform({point: projectPoint});
 
     var path = d3.geoPath().projection(transform);
@@ -300,7 +322,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
          topLeft = bounds[0],
          bottomRight = bounds[1];
 
-      var padding = 25;  
+      var padding =200;  
         topLeft = [topLeft[0]-padding, topLeft[1] - padding]
         bottomRight = [bottomRight[0]+padding, bottomRight[1]+ padding] 
   

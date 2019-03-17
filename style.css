@@ -114,6 +114,12 @@ circle{
     flex-direction: column;
 }
 
+.nationwide {
+    position: absolute;
+    width: 150px;
+    height: 20px;
+}
+
 .row {
     align-items: center;
     display: flex;
@@ -177,23 +183,24 @@ circle{
 
   .legend .circle1 {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    size: 40px;
+    width: 55px;
+    height: 55px;
+    size: 55px;
     stroke: #000000;
     color: #000000;
     vertical-align: middle;
+    margin-top: 2px;
     display: inline-block;
   }
 
 
 .legend .circle2 {
     position: relative;
-    left: 5px;
+    left: 9px;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    size: 28px;
+    width: 34.6px;
+    height: 34.6px;
+    size: 34.6px;
     margin-top: 2px;
     vertical-align: middle;
     stroke: #000000;
@@ -203,11 +210,11 @@ circle{
 .legend .circle3 {
     vertical-align: middle;
     position: relative;
-    left: 9px;
+    left: 14px;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    size: 20px;
+    width: 24.5px;
+    height: 24.5px;
+    size: 24.5px;
     margin-top: 2px;
     stroke: #000000;
     color: #000000;
@@ -216,12 +223,12 @@ circle{
 .legend .circle4 {
     vertical-align: middle;
     position: relative;
-    left: 13px;
+    left: 20px;
     border-radius: 50%;
-    width: 9px;
-    height: 9px;
+    width: 11px;
+    height: 11px;
     margin-top: 2px;
-    size: 9px;
+    size: 11px;
     stroke: #000000;
     color: #000000;
   }
