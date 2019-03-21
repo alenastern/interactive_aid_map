@@ -87,6 +87,60 @@ function myBar(ghanaCount) {
         .style("font-family",'"Lucida Console", monospace')
         .style("font-size", "12px");
 
+
+
+    var FundingButton = svg2.append("g")
+      .attr("id", "LabButton")
+      .attr("opacity", 10)
+      .attr('class', "HistButton")
+      .attr("transform", "translate(" + 20 + "," + 10 + ")");
+    
+    FundingButton.append("rect")
+      .attr("x", 120)
+      .attr("y", 15)
+      .attr("width", 85)
+      .attr("height", 25);
+    
+    FundingButton.append("text")
+      .attr("x", 130)
+      .attr("y", 30)
+      .html(" Funding ");
+
+    var PerformanceButton = svg2.append("g")
+      .attr("id", "LabButton")
+      .attr("opacity", 10)
+      .attr('class', "HistButton")
+      .attr("transform", "translate(" + 20 + "," + 10 + ")");
+    
+    PerformanceButton.append("rect")
+      .attr("x", 260)
+      .attr("y", 15)
+      .attr("width", 85)
+      .attr("height", 25);
+    
+    PerformanceButton.append("text")
+      .attr("x", 270)
+      .attr("y", 30)
+      .html(" Performance ");
+    
+    //Define click behavior
+
+    // JQButton.on("click", function() {
+    //   d3.selectAll(".dot").remove();
+    //   d3.selectAll("text.scattertitle").remove();
+    //   d3.selectAll("text.scattersubtitle").remove();
+    //   d3.selectAll("text.xtext").remove();
+    //   d3.selectAll("text.ytext").remove();
+    //   d3.selectAll(".xaxis").remove();
+
+    //   // Produce new scatterplot:
+    //   updateVar("JobQuality", " Job Quality (%) ", "Job Quality ",
+    //    "Higher female LFP seems correlated with better jobs...")
+  
+
+  
+
+
     //http://bl.ocks.org/williaster/10ef968ccfdc71c30ef8
     //https://stackoverflow.com/questions/24193593/d3-how-to-change-dataset-based-on-drop-down-box-selection
 //     var dropdown = d3.select("#proj_highlight")

@@ -49,11 +49,11 @@ circle{
     display: flex;
     flex: 1;
     height: 550px;
-    width: 725px;
+    width: 750x;
 }
 
 #proj_highlight {
-    width: 450px;
+    width: 425px;
     height: 650px;
     margin-left: 10px;
 }
@@ -64,6 +64,23 @@ circle{
     height: 550px;
     width: 725px;
 }
+
+.HistButton {
+    cursor: pointer;
+
+}
+  .HistButton rect {
+    fill: #a9d9ef;
+    padding: 2px;
+    
+  }
+  
+  .HistButton text {
+    font-family: "Lucida Console", monospace; 
+    font-size: 11px;
+    text-align: center;
+    fill: black;
+  }
 
 #option_performance {
     display: flex;
