@@ -20,6 +20,7 @@ library(jsonlite)
 library(geojsonio)
 
 # use data cleaning script from exploration plots assignment to load and clean data
+#setwd('/Users/alenastern/Documents/Win2019/DataViz/interactive_aid_map')
 source(here("data_cleaning.R"))
 
 ### Create SDG Ghana Data, selecting max sdg by funding###
@@ -27,7 +28,7 @@ source(here("data_cleaning.R"))
 data_sdg_Ghana <- data_sdg %>%
   filter(country_name == "Ghana" & completion_year > 2000) %>%
   select(aiddata_id, wb_project_id, goal_1, goal_2, goal_3, goal_4, goal_5, goal_6, goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
-         goal_14, goal_15, goal_16, goal_17, six_overall_rating, performance_cat, satisfactory, donor) %>%
+         goal_14, goal_15, goal_16, goal_17, six_overall_rating, performance_cat, coalesced_purpose_code, satisfactory, donor) %>%
   gather(key = "goal", value = "funding", goal_1, goal_2, goal_3, goal_4, goal_5, goal_6, goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
          goal_14, goal_15, goal_16, goal_17) %>%
   filter(funding > 0 & !is.na(satisfactory))
@@ -68,9 +69,15 @@ wb_geo <- read.csv(here("data/WorldBank_Geocoded/data","level_1a.csv"), header =
 # merge geocoded and sdg data
 ppd_wb <- merge(x=wb_geo, y=data_sdg_Ghana, by.x="project_id", by.y="wb_project_id")
 
+nationwide_lat = 5
+nationwide_long = 2
+
+# Map nation-wide projects to the capital
+ppd_wb['latitude'][is.na(ppd_wb['latitude'])] <- nationwide_lat
+ppd_wb['longitude'][is.na(ppd_wb['longitude'])] <- nationwide_long
 
 data_wb_ghana <- ppd_wb %>% select(project_id, six_overall_rating, performance_cat, project_title, start_actual_isodate, end_actual_isodate, total_commitments,
-                                   total_disbursements, even_split_commitments, even_split_disbursements, goal, goal_name, latitude, longitude, geoname_id) %>% 
+                                  even_split_commitments, place_name, goal, goal_name, latitude, longitude, geoname_id) %>% 
   filter(!is.na(latitude) & !is.na(longitude)) %>% arrange(desc(total_commitments))
 
 data_wb_ghana %>% 
@@ -147,9 +154,17 @@ data_sdg_ghana_priority %>%
 
 
 data_gp_rating <- data_sdg_Ghana %>% filter(donor == "WB") %>% group_by(wb_project_id) %>% group_by(six_overall_rating) %>% summarise(count= n())
+data_gp_rating <- data_gp_rating %>% rename(category = six_overall_rating)
 data_gp_rating %>% 
   toJSON() %>%
   write_lines('d3_ghana_perf_count.json')
+
+data_gp_funding <- data_sdg_Ghana %>% filter(donor == "WB") %>% mutate(funding_cat = cut(total_commitments [...])) %>% 
+  group_by(funding_cat) %>% summarise(count = n()) %>% rename(category = funding_cat)
+  data_gp_funding %>% 
+    toJSON() %>%
+    write_lines('d3_ghana_fund_count.json')
+
 
 
 ############################
