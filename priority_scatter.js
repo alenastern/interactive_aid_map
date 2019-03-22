@@ -131,7 +131,7 @@ function myScatter(ghanaPriority) {
     
     svg1.append('text')
         .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
-        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 3)
         .attr('text-anchor', 'middle')
         .text('Donor Priority Ranking')
         .style("font-family",'"Lucida Console", monospace')

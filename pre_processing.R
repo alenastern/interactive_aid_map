@@ -21,13 +21,14 @@ library(geojsonio)
 
 # use data cleaning script from static portfolio to load and clean data
 
+# assumes running from exploring-aid-performance r project
+source(here("data_cleaning.R"))
+
 # assumes that static portfolio directory and interactive directory are sibling directories
 wd <- getwd()
 setwd("..")
 parent <- getwd()
 setwd(wd)
-
-source(here("data_cleaning.R"))
 
 ### Create SDG Ghana Data, selecting max sdg by funding###
 
@@ -75,8 +76,8 @@ wb_geo <- read.csv(here("data/WorldBank_Geocoded/data","level_1a.csv"), header =
 # merge geocoded and sdg data
 ppd_wb <- merge(x=wb_geo, y=data_sdg_Ghana, by.x="project_id", by.y="wb_project_id")
 
-nationwide_lat = 5
-nationwide_long = 2
+nationwide_lat = 5.4
+nationwide_long = 2.2
 
 # Map nation-wide projects to the capital
 ppd_wb['latitude'][is.na(ppd_wb['latitude'])] <- nationwide_lat

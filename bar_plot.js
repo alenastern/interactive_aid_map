@@ -81,7 +81,7 @@ function myBar(ghanaCount, ghanaFunding) {
     
     svg2.append('text')
         .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
-        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+        .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 3)
         .attr('text-anchor', 'middle')
         .attr('class', 'axis-label')
         .text('Performance Rating')
@@ -227,7 +227,7 @@ function myBar(ghanaCount, ghanaFunding) {
         // update x axis label
         svg2.append('text')
             .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
-            .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+            .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 3)
             .attr('text-anchor', 'middle')
             .attr('class', 'axis-label')
             .text(x_lab_dict[var_name].label)

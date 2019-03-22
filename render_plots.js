@@ -1,7 +1,7 @@
 // define dimension constants
 const plot_dims = {
     map: {
-        height: 900,
+        height: 550,
         margin: {
             top: 10,
             left: 10,
@@ -10,13 +10,13 @@ const plot_dims = {
             }
         },
     scatter: {
-        height: 260,
+        height: 230,
         width: 430,
         margin: {
             top: 30,
             left: 70,
             right: 0,
-            bottom: 40
+            bottom: 30
         }
     }
 }

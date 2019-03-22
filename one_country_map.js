@@ -34,16 +34,16 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
   };
 
     //create leaflet map
-    var map = L.map('map', { center: [7.65, -1.2], zoom:7, minZoom: 6}); 
+    var map = L.map('map', { center: [7.8, -1.2], zoom:6.5, minZoom: 6}); 
         L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map); 
         L.geoJSON(ghanaShapes, {style: shapeStyle}).addTo(map); 
 
     // Home Button
     //referenced: https://gis.stackexchange.com/questions/127286/home-button-leaflet-map, inspired by Lauren Li presentation
     var home = {
-      lat: 7.65,
+      lat: 7.8,
       lng: -1.2,
-      zoom: 7
+      zoom: 6.5
       };
     
     // reset to_click to true when return home
@@ -285,7 +285,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         }
       };
 
-    var bounds = [[5.85, 1.15], [4.15, 2.85]];
+    var bounds = [[6.25, 1.35], [4.55, 3.05]];
     
     L.rectangle(bounds, {color: "white", weight: 3, opacity: .8, fill: true, fillColor: "white", fillOpacity: 0.3 })
     .bindTooltip("National Projects", {permanent: true, direction: "top"}).addTo(map);
