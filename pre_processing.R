@@ -78,6 +78,8 @@ ppd_wb['longitude'][is.na(ppd_wb['longitude'])] <- nationwide_long
 
 data_wb_ghana <- ppd_wb %>% select(project_id, six_overall_rating, performance_cat, project_title, start_actual_isodate, end_actual_isodate, total_commitments,
                                   even_split_commitments, place_name, goal, goal_name, latitude, longitude, geoname_id) %>% 
+  mutate(funding_cat = cut(total_commitments, breaks = c(0, 50000000, 100000000, 150000000, 200000000, 250000000, 300000000), 
+                           labels = c(1, 2, 3, 4, 5, 6))) %>%
   filter(!is.na(latitude) & !is.na(longitude)) %>% arrange(desc(total_commitments))
 
 data_wb_ghana %>% 
@@ -159,7 +161,9 @@ data_gp_rating %>%
   toJSON() %>%
   write_lines('d3_ghana_perf_count.json')
 
-data_gp_funding <- data_sdg_Ghana %>% filter(donor == "WB") %>% mutate(funding_cat = cut(total_commitments [...])) %>% 
+data_gp_funding <- data_wb_ghana %>% group_by(project_id) %>% summarise(proj_commitment = mean(total_commitments)) %>% 
+  mutate(funding_cat = cut(proj_commitment, breaks = c(0, 50000000, 100000000, 150000000, 200000000, 250000000, 300000000), 
+                           labels = c(1, 2, 3, 4, 5, 6))) %>% 
   group_by(funding_cat) %>% summarise(count = n()) %>% rename(category = funding_cat)
   data_gp_funding %>% 
     toJSON() %>%

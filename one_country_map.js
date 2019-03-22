@@ -27,6 +27,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       d.sdg = d.properties.goal
       d.sdg_name = d.properties.goal_name
       d.geoid = d.properties.geoname_id
+      d.funding_cat = d.properties.funding_cat
      });
      
     console.log(ghanaWB)
@@ -64,9 +65,9 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     legend.onAdd = function (map) {
 
       var div = L.DomUtil.create('div', 'info legend'),
-          grades = [1, 2, 3, 4, 5, 6],
-          labels = ['Highly Unsatisfactory', 'Unsatisfactory', 'Marginally Unsatisfactory', 'Marginally Satisfactory',
-          'Satisfactory', 'Highly Satisfactory'];
+          grades = [6, 5, 4, 3, 2, 1],
+          labels = ['Highly Satisfactory', 'Satisfactory', 'Marginally Satisfactory', 'Marginally Unsatisfactory',
+          'Unsatisfactory', 'Highly Unsatisfactory'];
 
       for (var i = 0; i < grades.length; i++) {
           div.innerHTML +=
@@ -153,7 +154,13 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
     // function to change color of performance rect stroke on hover
     var onPerf = function(d) {
-      d3.select("#cat_" + d.performance)
+      d3.selectAll(".performance").filter("#cat_" + d.performance)
+      .style("stroke", "#E31480")
+      .style("opacity", .9);
+    }
+
+    var onFund = function(d) {
+      d3.selectAll(".funding").filter("#cat_" + d.funding_cat)
       .style("stroke", "#E31480")
       .style("opacity", .9);
     }
@@ -173,8 +180,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
     }
 
     var outPerf = function(d) {
-      d3.select("#cat_" + d.performance)
+      d3.selectAll(".performance").filter("#cat_" + d.performance)
       .style("stroke", color(d.performance))
+      .style("opacity", .7);
+    }
+
+    var outFund = function(d) {
+      d3.selectAll(".funding").filter("#cat_" + d.funding_cat)
+      .style("stroke", gradient(d.funding_cat))
       .style("opacity", .7);
     }
 
@@ -284,12 +297,14 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         onColor.call(this, d);
         onGoal.call(this, d);
         onPerf.call(this, d);
+        onFund.call(this,d);
       });
       circles.on("mouseout", function(d) {
         tipMouseout(d);
         outColor.call(this, d);
         outGoal.call(this, d);
         outPerf.call(this, d);
+        outFund.call(this, d);
       });
     
     //var myIcon = L.divIcon({html: 'Nation-Wide Projects', className:'nationwide'});

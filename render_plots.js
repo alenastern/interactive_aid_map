@@ -11,7 +11,7 @@ const plot_dims = {
         },
     scatter: {
         height: 260,
-        width: 410,
+        width: 430,
         margin: {
             top: 30,
             left: 70,
@@ -21,22 +21,23 @@ const plot_dims = {
     }
 }
 
-const x_lab_dict = {funding: "Total Project Commitment", performance: "Preformance Category"}
-//var to_click = true
-// define color scale
+// define x axis label dictionary for bar plot
+const x_lab_dict = {funding: {label: "Total Project Funding", ticks: ['$0-50M', '$50-100M', '$100-150M', '$150-200M', '$200-250M', '$250-300M'] }, 
+                    performance: {label: "Preformance Category", ticks: [1, 2, 3, 4, 5, 6]}}
+
+// define color scale for performance throughout plots
 var colorRange = ['#125169', '#2699D0', '#a9d9ef','#fabe7a', '#F89E37', '#b83d05'];
 var color = d3.scaleOrdinal()
   .domain([6, 5, 4, 3, 2, 1])
   .range(colorRange);
 
+// define gradient color scale for funding bars in bar plot 
 var gradientRange = ['#11445c','#1d749e', '#2699D0', '#52b1df', '#94cfeb', '#d6edf8']
 var gradient = d3.scaleOrdinal()
    .domain([6, 5, 4, 3, 2, 1])
    .range(gradientRange);
 
-   //render plots
-
-//
+//render plots
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all(['./ghana_2.geojson',
     './ghana_wb.geojson', './d3_ghana_priority.json',
@@ -54,11 +55,3 @@ document.addEventListener('DOMContentLoaded', () => {
         myBar(ghanaCount, ghanaFunding);
         })
     });
-
-    // can add controls from here
-    // can just make them all siblings, don't have to do the pass then => myVis; myScatter; myBar;
-    // give function argument that relates to which column accessing, write function that has responsivenessin here that calls dropdown
-    // write function call render all visualizations, which column to use and passes to all functions (called update())
-    // call update to make initial page load happen
-    // new function create dropdown -> pass update function as argument to create dropdown
-    // dropdown has listners on options, when click option, call update function with appropriate value from option list (just do for bar plot)

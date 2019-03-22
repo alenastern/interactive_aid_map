@@ -7,7 +7,6 @@ function myBar(ghanaCount, ghanaFunding) {
     .append('svg')
     .attr('width', plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)
     .attr('height', plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)
-    //.attr('y', 355 + "px");
 
     var g2= svg2.append("g")
     .attr("transform", `translate(20, ${plot_dims.scatter.margin.top})`);
@@ -56,7 +55,7 @@ function myBar(ghanaCount, ghanaFunding) {
 
     rects.enter()
         .append('rect')
-        .attr('class', 'rect')
+        .attr('class', 'rect performance')
         .attr('width', x.bandwidth())
         .attr('x', d => x(d.category))
         .attr('y', plot_dims.scatter.height)
@@ -92,29 +91,33 @@ function myBar(ghanaCount, ghanaFunding) {
         .style("font-size", "12px");
 
 
-
+    // 
     var FundingButton = svg2.append("g")
-      .attr("id", "LabButton")
+      .attr("id", "Funding")
       .attr("opacity", 10)
       .attr('class', "HistButton")
       .attr("transform", "translate(" + 20 + "," + 10 + ")");
     
     FundingButton.append("rect")
+      .attr('class', "HistButtonRect Funding")
       .attr("x", 120)
       .attr("y", 15)
       .attr("width", 85)
-      .attr("height", 25);
+      .attr("height", 25)
+      .style("stroke", '#a9d9ef')
+      .style("stroke-width", "2px");
     
     FundingButton.append("text")
-      .attr("x", 130)
+      .attr("x", 137)
       .attr("y", 30)
       .html(" Funding ");
 
     FundingButton.on("click", function() {
+      d3.selectAll(".HistButtonRect").style("stroke", '#a9d9ef').filter("." + this.getAttribute('id')).style("stroke", "#E31480");
       d3.selectAll(".rect").remove();
       d3.selectAll(".axis-label").remove();
       d3.selectAll(".xaxis").remove();
-     // d3.selectAll(".yaxis").remove();
+      d3.selectAll(".yaxis").remove();
 
       // update bar plot
       updateBar(ghanaFunding, "funding");
@@ -122,26 +125,30 @@ function myBar(ghanaCount, ghanaFunding) {
     });
 
     var PerformanceButton = svg2.append("g")
-      .attr("id", "LabButton")
+      .attr("id", "Performance")
       .attr("opacity", 10)
       .attr('class', "HistButton")
       .attr("transform", "translate(" + 20 + "," + 10 + ")");
     
     PerformanceButton.append("rect")
+      .attr('class', "HistButtonRect Performance")
       .attr("x", 260)
       .attr("y", 15)
       .attr("width", 85)
-      .attr("height", 25);
+      .attr("height", 25)
+      .style("stroke", '#E31480')
+      .style("stroke-width", "2px");
     
     PerformanceButton.append("text")
-      .attr("x", 270)
+      .attr("x", 267)
       .attr("y", 30)
       .html(" Performance ");
 
     PerformanceButton.on("click", function() {
+        d3.selectAll(".HistButtonRect").style("stroke", '#a9d9ef').filter("." + this.getAttribute('id')).style("stroke", "#E31480");
         d3.selectAll(".rect").remove();
         d3.selectAll(".axis-label").remove();
-        //d3.selectAll(".xaxis").remove();
+        d3.selectAll(".xaxis").remove();
         d3.selectAll(".yaxis").remove();
 
         // update bar plot
@@ -149,6 +156,7 @@ function myBar(ghanaCount, ghanaFunding) {
 
     })
 
+    // approach inspired by Elena BG's final presentation and informed by http://bl.ocks.org/d3noob/7030f35b72de721622b8
     function updateBar(data, var_name){  
 
        const variable = var_name
@@ -160,29 +168,41 @@ function myBar(ghanaCount, ghanaFunding) {
             };
           }, {min: Infinity, max: -Infinity});
 
-        // if (var_name === "funding"){
-        //     var colorScale = color();
-        //     var x_lab = "Total Project Funding";
-        //   } else {
-        //     var colorScale = gradient();
-        //     var x_lab = "Performance Category";
-        // }
-    
         // create scales
     
         const y =  d3.scaleLinear()
             .domain([0, yDomain.max])
             .range([plot_dims.scatter.height, plot_dims.scatter.margin.top]);
+
+        const x = d3.scaleBand()
+            .domain([1, 2, 3, 4, 5, 6])
+            .range([0, plot_dims.scatter.width - plot_dims.scatter.margin.left - 15])
+            .padding([0.2]);
+
+        console.log(x_lab_dict[var_name].ticks)
+
+        g2.append("g")
+            .call(d3.axisBottom(x).tickValues([1, 2, 3, 4, 5, 6]).tickFormat(function(d,i){ return x_lab_dict[var_name].ticks[i]; }))
+            .attr('class', 'xaxis')
+            .attr("transform", `translate(${plot_dims.scatter.margin.left}, ${plot_dims.scatter.height})`)
+            .selectAll(".tick > text")
+            .style("font-family",'"Lucida Console", monospace')
+            .style("font-sixe", "8px");
+            
+        g2.append('g')
+            .call(d3.axisLeft(y))
+            .attr('class', 'yaxis')
+            .attr('transform', `translate(${plot_dims.scatter.margin.left}, 0)`)
+            .selectAll(".tick > text")
+            .style("font-family",'"Lucida Console", monospace');
     
         // create bars
         var rects = chart.selectAll("rect")
             .data(data);
 
-        // rename six_overall_rating to category
-
         rects.enter()
             .append('rect')
-            .attr('class', 'rect')
+            .attr('class', 'rect '+ variable)
             .attr('width', x.bandwidth())
             .attr('x', d => x(d.category))
             .attr('y', plot_dims.scatter.height)
@@ -202,7 +222,6 @@ function myBar(ghanaCount, ghanaFunding) {
               } else {
                   return color(d.category);
               }})
-            //d => colorScale(d.category))
             .style("stroke-width", 3)
             .style("opacity", .7)
             .attr("id", d => "cat_" + d.category)
@@ -210,52 +229,15 @@ function myBar(ghanaCount, ghanaFunding) {
             .duration(3000)
             .attr('y', d => y(d.count))
             .attr('height', d => plot_dims.scatter.height - y(d.count) - 2);
-            
-        //add x axis label
-        //x_lab_dict.var_name
         
         svg2.append('text')
             .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
             .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
             .attr('text-anchor', 'middle')
             .attr('class', 'axis-label')
-            .text(x_lab_dict[var_name])
+            .text(x_lab_dict[var_name].label)
             .style("font-family",'"Lucida Console", monospace')
             .style("font-size", "12px");
     
     }
-
-
-    
-    
-    //Define click behavior
-
-    // JQButton.on("click", function() {
-    //   d3.selectAll(".dot").remove();
-    //   d3.selectAll("text.scattertitle").remove();
-    //   d3.selectAll("text.scattersubtitle").remove();
-    //   d3.selectAll("text.xtext").remove();
-    //   d3.selectAll("text.ytext").remove();
-    //   d3.selectAll(".xaxis").remove();
-
-    //   // Produce new scatterplot:
-    //   updateVar("JobQuality", " Job Quality (%) ", "Job Quality ",
-    //    "Higher female LFP seems correlated with better jobs...")
-  
-
-  
-
-
-    //http://bl.ocks.org/williaster/10ef968ccfdc71c30ef8
-    //https://stackoverflow.com/questions/24193593/d3-how-to-change-dataset-based-on-drop-down-box-selection
-//     var dropdown = d3.select("#proj_highlight")
-//         .insert("select", "svg")
-//         .on("change", dropdownChange);
-
-//     var dropdownChange = function(d){
-
-//     }
-//     dropdown.selectAll("option")
-//                     .text('Performance'); 
-
  }

@@ -52,7 +52,8 @@ function myScatter(ghanaPriority) {
             var diff = d.donor_priority - d.leader_priority
 
             var html  = "<b>Goal: </b> " + d.goal_name + '</br>' +
-                        "<b>Donor-Leader Ranking Difference: </b>" + diff;
+                        "<b>Donor-Leader Ranking Difference: </b>" + diff + '</br>' +
+                        "<b>Avg. Performance: </b>" + d.performance_cat;
       
             tooltip.html(html)
                 .attr("padding", 3 + "px")
