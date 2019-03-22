@@ -1,4 +1,4 @@
-function myBar(ghanaCount) {    
+function myBar(ghanaCount, ghanaFunding) {    
     
     console.log(ghanaCount);
 
@@ -33,12 +33,14 @@ function myBar(ghanaCount) {
     // create axes
     g2.append("g")
         .call(d3.axisBottom(x).tickValues([1, 2, 3, 4, 5, 6]))
+        .attr('class', 'xaxis')
         .attr("transform", `translate(${plot_dims.scatter.margin.left}, ${plot_dims.scatter.height})`)
         .selectAll(".tick > text")
         .style("font-family",'"Lucida Console", monospace');
         
     g2.append('g')
         .call(d3.axisLeft(y))
+        .attr('class', 'yaxis')
         .attr('transform', `translate(${plot_dims.scatter.margin.left}, 0)`)
         .selectAll(".tick > text")
         .style("font-family",'"Lucida Console", monospace');
@@ -56,14 +58,14 @@ function myBar(ghanaCount) {
         .append('rect')
         .attr('class', 'rect')
         .attr('width', x.bandwidth())
-        .attr('x', d => x(d.six_overall_rating))
+        .attr('x', d => x(d.category))
         .attr('y', plot_dims.scatter.height)
         .attr('height', 0)
-        .style("fill",  d => color(d.six_overall_rating))
-        .style("stroke", d => color(d.six_overall_rating))
+        .style("fill",  d => color(d.category))
+        .style("stroke", d => color(d.category))
         .style("stroke-width", 3)
         .style("opacity", .7)
-        .attr("id", d => "cat_" + d.six_overall_rating)
+        .attr("id", d => "cat_" + d.category)
         .transition()
         .duration(3000)
         .attr('y', d => y(d.count))
@@ -71,6 +73,7 @@ function myBar(ghanaCount) {
         
     //add axis labels
     svg2.append('text')
+        // do i need to fix - ?
         .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
         .attr('y', plot_dims.scatter.margin.left -10)
         .attr('transform', 'rotate(-90)')
@@ -83,6 +86,7 @@ function myBar(ghanaCount) {
         .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
         .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
         .attr('text-anchor', 'middle')
+        .attr('class', 'axis-label')
         .text('Performance Rating')
         .style("font-family",'"Lucida Console", monospace')
         .style("font-size", "12px");
@@ -106,6 +110,17 @@ function myBar(ghanaCount) {
       .attr("y", 30)
       .html(" Funding ");
 
+    FundingButton.on("click", function() {
+      d3.selectAll(".rect").remove();
+      d3.selectAll(".axis-label").remove();
+      d3.selectAll(".xaxis").remove();
+     // d3.selectAll(".yaxis").remove();
+
+      // update bar plot
+      updateBar(ghanaFunding, "funding");
+
+    });
+
     var PerformanceButton = svg2.append("g")
       .attr("id", "LabButton")
       .attr("opacity", 10)
@@ -122,6 +137,96 @@ function myBar(ghanaCount) {
       .attr("x", 270)
       .attr("y", 30)
       .html(" Performance ");
+
+    PerformanceButton.on("click", function() {
+        d3.selectAll(".rect").remove();
+        d3.selectAll(".axis-label").remove();
+        //d3.selectAll(".xaxis").remove();
+        d3.selectAll(".yaxis").remove();
+
+        // update bar plot
+        updateBar(ghanaCount, "performance");
+
+    })
+
+    function updateBar(data, var_name){  
+
+       const variable = var_name
+
+        const yDomain = data.reduce((acc, row) => {
+            return {
+              min: Math.min(row.count, acc.min),
+              max: Math.max(row.count, acc.max)
+            };
+          }, {min: Infinity, max: -Infinity});
+
+        // if (var_name === "funding"){
+        //     var colorScale = color();
+        //     var x_lab = "Total Project Funding";
+        //   } else {
+        //     var colorScale = gradient();
+        //     var x_lab = "Performance Category";
+        // }
+    
+        // create scales
+    
+        const y =  d3.scaleLinear()
+            .domain([0, yDomain.max])
+            .range([plot_dims.scatter.height, plot_dims.scatter.margin.top]);
+    
+        // create bars
+        var rects = chart.selectAll("rect")
+            .data(data);
+
+        // rename six_overall_rating to category
+
+        rects.enter()
+            .append('rect')
+            .attr('class', 'rect')
+            .attr('width', x.bandwidth())
+            .attr('x', d => x(d.category))
+            .attr('y', plot_dims.scatter.height)
+            .attr('height', 0)
+            .style("fill",  function(d) {
+              if (variable === "funding") {
+                  return gradient(d.category);
+              } else {
+                  console.log("here");
+                  return color(d.category);
+                  
+              }})
+            .style("stroke", function(d) {
+              console.log(variable)
+              if (variable === "funding") {
+                  return gradient(d.category);
+              } else {
+                  return color(d.category);
+              }})
+            //d => colorScale(d.category))
+            .style("stroke-width", 3)
+            .style("opacity", .7)
+            .attr("id", d => "cat_" + d.category)
+            .transition()
+            .duration(3000)
+            .attr('y', d => y(d.count))
+            .attr('height', d => plot_dims.scatter.height - y(d.count) - 2);
+            
+        //add x axis label
+        //x_lab_dict.var_name
+        
+        svg2.append('text')
+            .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
+            .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)
+            .attr('text-anchor', 'middle')
+            .attr('class', 'axis-label')
+            .text(x_lab_dict[var_name])
+            .style("font-family",'"Lucida Console", monospace')
+            .style("font-size", "12px");
+    
+    }
+
+
+    
     
     //Define click behavior
 
