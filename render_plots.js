@@ -40,7 +40,7 @@ var gradient = d3.scaleOrdinal()
 document.addEventListener('DOMContentLoaded', () => {
     Promise.all(['./ghana_2.geojson',
     './ghana_wb.geojson', './d3_ghana_priority.json',
-    './d3_ghana_perf_count.json', 'd3_ghana_fund_count.json'
+    './d3_ghana_perf_count.json', './d3_ghana_fund_count.json'
     ].map(url => fetch(url).then(data => data.json())))
     .then(([ghanaShapes, ghanaWB, ghanaPriority, ghanaCount, ghanaFunding]) => {
      myVis(ghanaShapes, ghanaWB, ghanaPriority, ghanaCount, ghanaFunding);
