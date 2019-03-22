@@ -4,15 +4,11 @@
 
 function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
 
-    console.log(ghanaPriority);
-
     var goal_dict = {};
 
     ghanaPriority.forEach(d => goal_dict[d.goal] = d.six_overall_rating)
 
     // add leaflet LatLng feature and define variables for project data
-
-    // change to commitment per location
     ghanaWB.features.forEach(function(d) {
       d.LatLng = new L.LatLng(d.geometry.coordinates[1], d.geometry.coordinates[0])
       d.funding = d.properties.even_split_commitments
@@ -29,8 +25,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       d.geoid = d.properties.geoname_id
       d.funding_cat = d.properties.funding_cat
      });
-     
-    console.log(ghanaWB)
 
      // style polygon layer
     var shapeStyle = {
@@ -88,16 +82,42 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         labels = ['$1M', '$5M', '$10M', '$25M'];
 
         div2.innerHTML = 
-        
+        '<div class="row" "><img src=question.png id="question"></img><span class="legend inner-row"> Funding per Location </span></div>' +
         '<div class="row" "><i class="inner-circle circle4" ></i><span class="legend inner-row">' + labels[0] + '</span></div>' +
         '<div class="row" "><i class="inner-cirlce circle3" ></i><span class="legend inner-row">' + labels[1] + '</span></div>' +
         '<div class="row" "><i class="inner-cirlce circle2" ></i><span class="legend inner-row">' + labels[2] + '</span></div>' +
         '<div class="row" "><i class="inner-cirlce circle1" ></i><span class="legend inner-row">' + labels[3] + '</span></div>' 
 
+
     return div2;
     };
 
     circ_legend.addTo(map);
+
+    var leg_question =  d3.select(map.getContainer()).append("div")
+      .attr("padding", 10 + "px")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // Question hover for circle legend
+      d3.select('#question')
+        .on("mouseover", function(d) {
+
+            var html = 'Divides total project funding <br> by number of project locations to <br> approximate funding at each location'
+            leg_question.html(html)
+                .attr("padding", 3 + "px")
+                .style("z-index", "9999")
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px")
+                .transition()
+                  .duration(200)
+                  .style('opacity', .9)
+          })
+        .on('mouseout', function(d) {
+            leg_question.transition()
+              .duration(200)
+              .style('opacity', 0);
+          });
 
     //Add Info Tooltip
     //inspired by: https://leafletjs.com/examples/choropleth/
@@ -116,7 +136,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
           "<b>Start Date:</b> " + d.start + " <b>End Date:</b> " + d.end + "<br/>" + 
           "<b>Location:</b>" + d.place_name + "<br/>" + 
           "<b>Funding/# Locations:</b> " + d3.format("($.2f")(d.funding/1000000)+"M  " +  "<b>Total Funding: </b>" +  d3.format("($.2f")(d.total_funding/1000000)+"M" + "<br/>" +
-          "<b>Goal:</b> " + d.sdg_name 
+          "<b>SDG:</b> " + d.sdg_name 
             : 'Hover over a project location to learn more <br/> Click on a project location to zoom');
     };
 
@@ -159,6 +179,7 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
       .style("opacity", .9);
     }
 
+    // function to change color of funding rect stroke on hover
     var onFund = function(d) {
       d3.selectAll(".funding").filter("#cat_" + d.funding_cat)
       .style("stroke", "#E31480")
@@ -306,17 +327,6 @@ function myVis(ghanaShapes, ghanaWB, ghanaPriority) {
         outPerf.call(this, d);
         outFund.call(this, d);
       });
-    
-    //var myIcon = L.divIcon({html: 'Nation-Wide Projects', className:'nationwide'});
-    //L.marker([5.6, 0.6], {icon: myIcon}).addTo(map);
-
-        // define rectangle geographical bounds
-    
-    // create an orange rectangle
-    
-    // var text = new L.marker(rect.getBounds().getSouthEast(), {opacity: 0});
-    //   text.bindLabel("Nation-Wide Projects");
-    //   text.addTo(map);
 
     var transform = d3.geoTransform({point: projectPoint});
 

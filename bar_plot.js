@@ -1,6 +1,4 @@
 function myBar(ghanaCount, ghanaFunding) {    
-    
-    console.log(ghanaCount);
 
     // append svg and g for plot
     var svg2 = d3.select('#bar')
@@ -44,6 +42,7 @@ function myBar(ghanaCount, ghanaFunding) {
         .selectAll(".tick > text")
         .style("font-family",'"Lucida Console", monospace');
 
+    // create chart
     const chart = g2.append('g')
         .attr('transform', `translate(${plot_dims.scatter.margin.left},0)`)
         .attr('height', plot_dims.scatter.height)
@@ -66,13 +65,12 @@ function myBar(ghanaCount, ghanaFunding) {
         .style("opacity", .7)
         .attr("id", d => "cat_" + d.category)
         .transition()
-        .duration(3000)
+        .duration(2000)
         .attr('y', d => y(d.count))
         .attr('height', d => plot_dims.scatter.height - y(d.count) - 2);
         
     //add axis labels
     svg2.append('text')
-        // do i need to fix - ?
         .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
         .attr('y', plot_dims.scatter.margin.left -10)
         .attr('transform', 'rotate(-90)')
@@ -91,7 +89,7 @@ function myBar(ghanaCount, ghanaFunding) {
         .style("font-size", "12px");
 
 
-    // 
+    // create buttons to change bar plot
     var FundingButton = svg2.append("g")
       .attr("id", "Funding")
       .attr("opacity", 10)
@@ -156,7 +154,7 @@ function myBar(ghanaCount, ghanaFunding) {
 
     })
 
-    // approach inspired by Elena BG's final presentation and informed by http://bl.ocks.org/d3noob/7030f35b72de721622b8
+    // referenced: http://bl.ocks.org/d3noob/7030f35b72de721622b8, inspired by Elena BG's final presentation
     function updateBar(data, var_name){  
 
        const variable = var_name
@@ -168,8 +166,7 @@ function myBar(ghanaCount, ghanaFunding) {
             };
           }, {min: Infinity, max: -Infinity});
 
-        // create scales
-    
+        // update scales
         const y =  d3.scaleLinear()
             .domain([0, yDomain.max])
             .range([plot_dims.scatter.height, plot_dims.scatter.margin.top]);
@@ -179,8 +176,7 @@ function myBar(ghanaCount, ghanaFunding) {
             .range([0, plot_dims.scatter.width - plot_dims.scatter.margin.left - 15])
             .padding([0.2]);
 
-        console.log(x_lab_dict[var_name].ticks)
-
+        // update axes
         g2.append("g")
             .call(d3.axisBottom(x).tickValues([1, 2, 3, 4, 5, 6]).tickFormat(function(d,i){ return x_lab_dict[var_name].ticks[i]; }))
             .attr('class', 'xaxis')
@@ -196,7 +192,7 @@ function myBar(ghanaCount, ghanaFunding) {
             .selectAll(".tick > text")
             .style("font-family",'"Lucida Console", monospace');
     
-        // create bars
+        // update bars
         var rects = chart.selectAll("rect")
             .data(data);
 
@@ -211,12 +207,10 @@ function myBar(ghanaCount, ghanaFunding) {
               if (variable === "funding") {
                   return gradient(d.category);
               } else {
-                  console.log("here");
                   return color(d.category);
                   
               }})
             .style("stroke", function(d) {
-              console.log(variable)
               if (variable === "funding") {
                   return gradient(d.category);
               } else {
@@ -226,10 +220,11 @@ function myBar(ghanaCount, ghanaFunding) {
             .style("opacity", .7)
             .attr("id", d => "cat_" + d.category)
             .transition()
-            .duration(3000)
+            .duration(2000)
             .attr('y', d => y(d.count))
             .attr('height', d => plot_dims.scatter.height - y(d.count) - 2);
         
+        // update x axis label
         svg2.append('text')
             .attr('x', (plot_dims.scatter.width + plot_dims.scatter.margin.left + plot_dims.scatter.margin.right)/2)
             .attr('y', plot_dims.scatter.margin.top + plot_dims.scatter.height + plot_dims.scatter.margin.bottom - 10)

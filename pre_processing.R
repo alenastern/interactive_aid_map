@@ -19,8 +19,14 @@ library(ggplot2)
 library(jsonlite)
 library(geojsonio)
 
-# use data cleaning script from exploration plots assignment to load and clean data
-#setwd('/Users/alenastern/Documents/Win2019/DataViz/interactive_aid_map')
+# use data cleaning script from static portfolio to load and clean data
+
+# assumes that static portfolio directory and interactive directory are sibling directories
+wd <- getwd()
+setwd("..")
+parent <- getwd()
+setwd(wd)
+
 source(here("data_cleaning.R"))
 
 ### Create SDG Ghana Data, selecting max sdg by funding###
@@ -84,10 +90,10 @@ data_wb_ghana <- ppd_wb %>% select(project_id, six_overall_rating, performance_c
 
 data_wb_ghana %>% 
   toJSON() %>%
-  write_lines('d3_ghana_data.json')
+  write_lines(paste(parent,'/interactive_aid_map/d3_ghana_data.json', sep = ''))
 
 
-data_gj <-  geojson_write(data_wb_ghana, lat = 'latitude', lon = 'longitude',  file = "ghana_wb.geojson")
+data_gj <-  geojson_write(data_wb_ghana, lat = 'latitude', lon = 'longitude',  file = paste(parent,'/interactive_aid_map/ghana_wb.geojson', sep = ''))
 
 
 ### LTL Data ###
@@ -152,14 +158,14 @@ data_sdg_ghana_priority$goal[data_sdg_ghana_priority$goal_name == "Partnerships 
 
 data_sdg_ghana_priority %>% 
   toJSON() %>%
-  write_lines('d3_ghana_priority.json')
+  write_lines(paste(parent,'/interactive_aid_map/d3_ghana_priority.json', sep = ''))
 
 
 data_gp_rating <- data_sdg_Ghana %>% filter(donor == "WB") %>% group_by(wb_project_id) %>% group_by(six_overall_rating) %>% summarise(count= n())
 data_gp_rating <- data_gp_rating %>% rename(category = six_overall_rating)
 data_gp_rating %>% 
   toJSON() %>%
-  write_lines('d3_ghana_perf_count.json')
+  write_lines(paste(parent,'/interactive_aid_map/d3_ghana_perf_count.json', sep = ''))
 
 data_gp_funding <- data_wb_ghana %>% group_by(project_id) %>% summarise(proj_commitment = mean(total_commitments)) %>% 
   mutate(funding_cat = cut(proj_commitment, breaks = c(0, 50000000, 100000000, 150000000, 200000000, 250000000, 300000000), 
@@ -167,64 +173,6 @@ data_gp_funding <- data_wb_ghana %>% group_by(project_id) %>% summarise(proj_com
   group_by(funding_cat) %>% summarise(count = n()) %>% rename(category = funding_cat)
   data_gp_funding %>% 
     toJSON() %>%
-    write_lines('d3_ghana_fund_count.json')
-
-
-
-############################
-#########SCRATCH############
-#############################
-
-
-(country_name == "Ghana") %>% select(project_id, precision_code, place_name, latitude, longitude, 
-                                     project_title, start_actual_isodate, end_actual_isodate, total_commitments,
-                                     total_disbursements, even_split_commitments, even_split_disbursements,
-                                     six_overall_rating, performance_cat, goal_1, goal_2, goal_3, goal_4, goal_5, goal_6, goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
-                                     goal_14, goal_15, goal_16, goal_17, six_overall_rating) %>%
-  gather(key = "goal", value, goal_1, goal_2, goal_3, goal_4, goal_5, goal_6, goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
-         goal_14, goal_15, goal_16, goal_17) %>% select(-value) %>% 
-
-  ### Rename SDGs ###
-  
-  #precision_code, place_name, latitude, longitude, 
-  
-  data_sdg_ghana <- data_sdg %>% filter(country_name == "Ghana") %>% select(wb_project_id, six_overall_rating, performance_cat, goal_1, goal_2, goal_3, goal_4, goal_5, goal_6,
-                                                                            goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
-                                                                            goal_14, goal_15, goal_16, goal_17, six_overall_rating) %>%
-  gather(key = "goal", value, goal_1, goal_2, goal_3, goal_4, goal_5, goal_6, goal_7, goal_8, goal_9, goal_10, goal_11, goal_12, goal_13,
-         goal_14, goal_15, goal_16, goal_17) %>% select(-value) 
-
-
-# rename goal numbers to goal names
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_1"] <- "No poverty"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_2"] <- "Zero hunger"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_3"] <- "Good health"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_4"] <- "Quality education"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_5"] <- "Gender equality"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_6"] <- "Clean water/sanitation"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_7"] <- "Affordable/clean energy"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_8"] <- "Economic growth"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_9"] <- "Industry/infra."
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_10"] <- "Reduced inequalities"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_11"] <- "Sustainable cities"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_12"] <- "Responsible consumption"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_13"] <- "Climate Action"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_14"] <- "Life below water"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_15"] <- "Life on land"
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_16"] <- "Peace/justice & strong inst."
-data_sdg_ghana$goal[data_sdg_ghana$goal == "goal_17"] <- "Partnerships for the goals"
-
-
-
-
-
-### Merge in World Bank Data ###
-
-wb_geo <- read.csv(here("data/WorldBank_Geocoded/data","level_1a.csv"), header = TRUE, sep= ",", fill = TRUE)
-
-# generate date and year variables #
-ppd_wb <- merge(x=wb_geo, y=data_sdg_ghana, by.x="project_id", by.y="wb_project_id", all.x = FALSE, all.y = FALSE)
-length(unique(ppd_wb[["project_id"]]))
-#ppd_wb_country <-ppd_wb %>% group_by(country_code) %>% summarize(count = n())
+    write_lines(paste(parent,'/interactive_aid_map/d3_ghana_fund_count.json', sep = ''))
 
 

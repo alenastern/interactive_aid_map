@@ -1,7 +1,5 @@
 
 function myScatter(ghanaPriority) {    
-    
-    console.log(ghanaPriority)
         
     // create SVG and G for scatterplot
     var svg1 = d3.select('#scatter')
@@ -12,6 +10,7 @@ function myScatter(ghanaPriority) {
     var g1= svg1.append("g")
     .attr("transform", `translate(20, ${plot_dims.scatter.margin.top})`);
 
+    // create scales
     const x = d3.scaleLinear()
     .domain([18, 1])
     .range([0, plot_dims.scatter.width - plot_dims.scatter.margin.left - 15]);
@@ -20,6 +19,7 @@ function myScatter(ghanaPriority) {
     .domain([18, 1])
     .range([plot_dims.scatter.height, 0]);
 
+    // create axes
     g1.append("g")
         .call(d3.axisBottom(x).tickValues([1,3,5,7,9,11,13,15,17]))
         .attr("transform", `translate(${plot_dims.scatter.margin.left}, ${plot_dims.scatter.height})`)
@@ -33,20 +33,18 @@ function myScatter(ghanaPriority) {
         .selectAll(".tick > text")
         .style("font-family",'"Lucida Console", monospace');
 
+    // create chart
     const chart = g1.append('g')
         .attr('transform', `translate(${plot_dims.scatter.margin.left},0)`)
         .attr('height', plot_dims.scatter.height)
         .attr('width', plot_dims.scatter.width)
 
+    //create tooltip
     var tooltip = d3.select("body").append("div")	
         .attr("class", "tooltip")	
         .attr("padding", 10 + "px")			
         .style("opacity", 0);
     
-    
-
-
-
     var tipMouseover = function(d) {
 
             var diff = d.donor_priority - d.leader_priority
@@ -72,7 +70,7 @@ function myScatter(ghanaPriority) {
                 .style("opacity", 0);
           };
     
-
+    // select all project locations corresponding to goal 
     var onGoal = function(d) {
         d3.selectAll("." + d.goal)
         .style("stroke", "#E31480")
@@ -84,8 +82,6 @@ function myScatter(ghanaPriority) {
             .style("stroke", 'black')
             .attr('stroke-width', 0.25);
           }
-
-    // add donor-leader differential to tooltip
     
     // add circles, transition, mouseover
     const circles = chart.selectAll(".circle")
@@ -113,7 +109,7 @@ function myScatter(ghanaPriority) {
                     outGoal.call(this, d);
                   });
 
-    //http://bl.ocks.org/jalapic/cf35b0212d18993ca07c
+    //referenced: http://bl.ocks.org/jalapic/cf35b0212d18993ca07c
     chart.append("line")
         .attr("x1", x(1))
         .attr("y1", y(1))
@@ -123,16 +119,7 @@ function myScatter(ghanaPriority) {
         .attr("stroke", "#4CA145")
         .attr("stroke-dasharray", "5,5");
 
-    // chart.append('text')
-    //     .attr('x', 250)
-    //     .attr('y', 250)
-    //     .attr('transform', 'rotate(-45)')
-    //     .attr('text-anchor', 'middle')
-    //     .text('Equal Leader and Donor Priority')
-    //     .style("font-family",'"Lucida Console", monospace')
-    //     .style("font-size", "9px")
-    //     .style("color", "#4CA145");
-
+    // axis labels and title
     svg1.append('text')
         .attr('x', -(plot_dims.scatter.height + plot_dims.scatter.margin.bottom + plot_dims.scatter.margin.top)/2)
         .attr('y', plot_dims.scatter.margin.left -10)
